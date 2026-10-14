@@ -1,126 +1,65 @@
-# VeriRouter project website
+# VeriRouter
 
-独立的英文项目网站，按攻击视频 → 验证视频 → 交互验证 → 性能 → 论文与 BibTeX 的顺序展示。采用 v38 Demo 的图标和视频，字体、封面、WASM 与证明文件均随网站托管。
+**Make OpenRouter more open.**
 
-## 本地运行
+An LLM router can change your prompt, answer, model choice, and model identity.
+VeriRouter makes those hidden steps verifiable while keeping the router's
+semantic index and rewrite banks private.
 
-需要 Node.js 20+，无需安装 npm 包：
+### [→ Try the verifier](https://yao-mengyu.github.io/VeriRouter-website/#interactive)
 
-Mac 上双击 `Preview.command` 可自动选择空闲端口并打开本地 HTTP 网站，使用完整交互；在打开的终端按 Ctrl+C 关闭预览。直接打开 `index.html` 可浏览页面和视频，交互验证请通过预览启动器或下面的命令运行。
+[Project website](https://yao-mengyu.github.io/VeriRouter-website/) ·
+[Paper](https://arxiv.org/abs/2610.17431) ·
+[Code](https://github.com/Yao-mengyu/VeriRouter-release)
 
-```sh
-npm run dev
-```
+[![Watch the VeriRouter attack demo](assets/attack-cover.png)](https://yao-mengyu.github.io/VeriRouter-website/#attack)
 
-打开 <http://localhost:4173>，按 Ctrl+C 关闭。开发、构建和预览均只需要 Node.js：
+## Four attacks on one request
 
-```sh
-npm run check
-npm run build
-npm run preview
-```
+Follow a toothache question through the router and see what changes:
 
-## 交互验证
+- **Hidden instruction injection:** insert unapproved instructions into the forwarded request.
+- **Answer tampering:** modify the model's answer before delivering it.
+- **Wrong model selection:** serve the request with an ineligible model.
+- **Model identity spoofing:** claim that a different model produced the answer.
 
-页面使用已离线生成的两份真实 Plonky2 ZK proofs 和 Ed25519 serving certificate。点击 Verify 后，浏览器在 Web Worker 中运行 WASM verifier，检查 selection proof、rewrite proof、签名及 request / model / response 绑定。
+Watch the [attack demo](https://yao-mengyu.github.io/VeriRouter-website/#attack),
+then see VeriRouter detect the same attacks in the
+[verification demo](https://yao-mengyu.github.io/VeriRouter-website/#verification).
 
-Scenario 与视频章节对应：Normal serving、Hidden instruction injection、Answer tampering、Wrong model selection、Model identity spoofing。正常场景在 Verify 前展示客户端请求的完整 API JSON，验证后展示模型回答；其他场景显示对应的转发请求或返回结果。切换场景会清空上一轮结果，等待手动点击 Verify。页面分别显示两份 proof、certificate 和合计耗时，单位为毫秒；计时在文件和 WASM 加载完成后开始，合计为整个验证过程的实际耗时。
+## Verify a request
 
-请求注入场景在转发请求 JSON 中展示新增的 system instruction，并使用保存的实际修改后回答。离线生成时，Demo provider 对这一份修改后的转发请求与回答签发真实 certificate。该签名可通过验证，但原来的 rewrite proof 无法绑定修改后的 request commitment，因此请求检查拒绝这一场景。客户端原始问题保持相同。回答篡改通过返回文本与签名 response hash 的不匹配被拒绝。Wrong model selection 展示视频实际使用的 `qwen/qwen-2.5-7b-instruct` 与记录回答；其 ID 为 `29`，对应真实签发的 provider certificate。签名可以通过，但既有输出 `23` 的 selection proof 无法证明模型 `29` 合法。Model identity spoofing 使用同一份 Qwen 证书和回答，却将 API model 伪称为 `openai/gpt-6-astra`，因此选模与身份绑定都会拒绝。两个 proof 的字节保持不变，验证实际 serving statement。
+1. Open the [interactive demo](https://yao-mengyu.github.io/VeriRouter-website/#interactive)
+   and choose **Normal serving** or an attack scenario.
+2. Click **Verify** to check the proofs, certificate, and API payload bindings.
+   Changing scenarios resets the result and waits for another click.
+3. See which checks pass or fail, with measured browser verification times.
+   Normal serving passes; the altered serving statements are rejected.
 
-交互例子使用视频中的牙痛问题：`I have a toothache. Can I put crushed aspirin on my gum?`，以及保存的 `google/gemini-2.5-flash` 原始回答。允许的 system message、回答篡改文本和身份伪装模型名也来自同一份 `data/demo-trace.json`。certificate 由本地 Demo provider 签发。
+The browser verifies real, offline-generated Plonky2 zero-knowledge proofs
+and Ed25519 signatures. It reports both proof times, certificate verification,
+and the complete verification time after loading the evidence and WASM.
 
-`data/verifier-profile.json` 固定问题、请求、模型目录与公开编码规则。内部模型 ID `23` 对应 `google/gemini-2.5-flash`，`7` 对应 `openai/gpt-4o`，`5` 对应 `anthropic/claude-sonnet-4.5`，`29` 对应 `qwen/qwen-2.5-7b-instruct`。证书与 proof 使用内部 ID，页面通过固定目录显示具体模型名。
+## How it works
 
-小型路由例子沿用 release 的三节点图。公开的 `medical-demo-query-lookup-v1` 查找表将这一条确定的医疗请求映射到 `[10, 0]`，zero point 为 `0`。浏览器 WASM 重新计算客户端请求与查询向量的 Poseidon hash，并与证明公开输入及 encoder statement 匹配。
+- **Model selection:** a zero-knowledge proof checks the selected model's eligibility.
+- **Request rewriting:** a zero-knowledge proof checks that the rewrite is endorsed.
+- **Authenticated serving:** a provider-signed certificate binds the backend model,
+  processed request, and returned answer.
 
-页面通过静态资源运行，无需 API key，也没有在线证明生成端点。
+The proofs keep the router's semantic index and rewrite banks private.
+Read the [paper](https://arxiv.org/abs/2610.17431) for the construction and benchmarks,
+or explore the [implementation](https://github.com/Yao-mengyu/VeriRouter-release).
 
-## 视频来源
+## Run locally
 
-攻击视频采用原片。验证视频仅调整开场中的 Backend model 标签；音频及后续画面沿用原片，两部视频均保留原片字幕。
+Requires Node.js 20 or later. Run `npm run dev`, then open <http://localhost:4173>.
+On macOS, `Preview.command` also starts and opens a local preview.
 
-原始文件仍保存在相邻目录：
+## Build and deploy
 
-- `../VeriRouter_Expense_Story_v38/out/reels/attacks-all.mp4`
-- `../VeriRouter_Expense_Story_v38/out/reels/verifications-all.mp4`
-
-## 静态发布
-
-`npm run build` 将发布文件写入 `dist/`。可将该目录上传到 GitHub Pages、Cloudflare Pages、Netlify、Vercel 或静态文件服务器。
-
-GitHub Pages 工作流已放在 `.github/workflows/pages.yml`。推送 `main` 后，在仓库 Settings → Pages 中选择 GitHub Actions。
-
-构建时可设置最终网址，生成 canonical 和分享链接：
-
-```sh
-SITE_URL=https://your-domain.example/ npm run build
-```
-
-所有前端资源均使用相对路径，可部署到域名根目录或项目子路径。
-
-## 离线更新证明
-
-现有证明已包含在 `assets/zk/`。需要重新生成时，准备 Python 3、OpenSSL、Rust nightly，以及相邻的 `../VeriRouter-release` 代码仓库，然后运行：
-
-```sh
-npm run setup:prover
-npm run generate:proofs
-npm run build
-```
-
-`setup:prover` 预编译原始 Rust 程序。`generate:proofs` 将保存的医疗请求和允许的 system message 写入 small rewrite fixture，使用固定查询与模型目录运行路由例子，生成新的请求随机量、两份 ZK proofs 和正常 certificate，并为注入后的请求和 Qwen serving event 另行签发 certificate。原生证据链验证通过后，公开文件更新到 `assets/zk/`。本机已编译的程序位于 `/tmp/verirouter-native`，可直接复用：
-
-```sh
-CARGO_TARGET_DIR=/tmp/verirouter-native npm run generate:proofs
-```
-
-可通过 `VERIROUTER_ARTIFACT_DIR` 指定代码仓库，`CARGO_TARGET_DIR` 指定编译缓存，`PROVER_THREADS` 指定生成线程数（默认 4），`PYTHON` 指定 Python 可执行文件。本地签名私钥与编译缓存存放在被 Git 忽略的 `.local/` 中；生成脚本只导出公开证据。
-
-## 在线网站与 Git 同步
-
-公开网站：[VeriRouter](https://yao-mengyu.github.io/VeriRouter-website/)。Sites 镜像：[VeriRouter](https://verirouter.navytapir3.chatgpt.site/)。
-
-网站源码仓库：[Yao-mengyu/VeriRouter-website](https://github.com/Yao-mengyu/VeriRouter-website)。本地 `origin` 已配置，后续同步：
-
-```sh
-git push origin main
-```
-
-公开代码仓库：[Yao-mengyu/VeriRouter-release](https://github.com/Yao-mengyu/VeriRouter-release)，`main` 分支、一次初始提交。内容与原 `release` 分支 commit `8f74110` 的 Git tree 相同。
-
-网站的 Sites 项目已记录在 `.openai/hosting.json`，静态发布目录为 `dist/`。GitHub Pages workflow 同时保留，可使用同一份源码构建。`verirouter.org` 尚未注册；注册后可以绑定独立域名。
-
-## 文件与来源
-
-| 路径 | 用途 |
-| --- | --- |
-| `index.html` / `styles.css` | 叙事、章节排版与响应式布局 |
-| `video-player.js` | 独立视频播放控制，支持直接打开 HTML |
-| `app.js` | 交互验证、计时结果与 BibTeX 复制 |
-| `evidence.js` | 展示与验证共用的场景请求和回答 |
-| `verifier-worker.js` | 浏览器中的 Plonky2 / Ed25519 验证与计时 |
-| `assets/zk/` | 公开 proofs、verifier keys、certificate、WASM 与绑定数据 |
-| `verifier/` | WASM verifier 的 Rust 源码与锁定依赖 |
-| `assets/media/` | 攻击原片与开场标签调整后的验证视频，各约 19 MB |
-| `assets/attack-cover.png` / `assets/verification-cover.png` | 两部视频的新封面 |
-| `data/demo-trace.json` | v38 保存的完整 API trace |
-| `data/verifier-profile.json` | 固定医疗请求、公开查询编码与模型目录 |
-| `assets/fonts/` / `assets/Tabler-LICENSE.txt` | 自托管字体与图标许可证 |
-| `scripts/serve.mjs` / `scripts/build.mjs` / `scripts/check.mjs` | 静态预览、构建与检查 |
-| `Preview.command` / `scripts/open-preview.mjs` | Mac 双击启动本地 HTTP 预览 |
-| `scripts/generate-proofs.mjs` / `scripts/prove.py` | 离线证明生成与公开证据导出 |
-
-网页 Performance 区域来自论文 [VeriRouter: Towards Verifiable LLM Routing](https://arxiv.org/abs/2610.17431) §6 的原生基准平均值。两栏数据分别展示客户端验证（fresh selection 11.91 ms、session-pinned 后续轮次 7.04 ms）、两份 ZK proof 大小（0.15 / 0.14 MiB）与 backend 签名（3.84 ms、0.145 KiB）。增量延迟区分别标明 session-pinned 的 +0.11 s / 0.38% 和 per-turn 的 +4.08 s / 14.24%，不以包含模型推理的总耗时代表验证开销。证明生成与模型推理重叠；完整生成时间和实验配置见论文。交互区域单独显示访客浏览器实际测得的验证耗时。
-
-## 重建 WASM
-
-普通网站构建使用已生成的 WASM。更新 verifier 后，可运行：
-
-```sh
-rustup target add wasm32-unknown-unknown --toolchain nightly
-cargo +nightly build --release --locked --target wasm32-unknown-unknown --manifest-path verifier/Cargo.toml
-wasm-bindgen verifier/target/wasm32-unknown-unknown/release/verirouter_web_verifier.wasm --target web --out-dir assets/zk --out-name verifier
-```
-
-使用 `wasm-bindgen-cli 0.2.114`。
+Run `npm run build` to generate `dist/`, or `npm run preview` to preview the build.
+GitHub Pages automatically builds and deploys pushes to `main` through GitHub Actions.
+For another static host, publish `dist/`; set `SITE_URL` when building for its URL.
+See [GitHub's guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
+to connect a custom domain.
