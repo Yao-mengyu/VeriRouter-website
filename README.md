@@ -1,6 +1,6 @@
 # VeriRouter project website
 
-独立的英文项目网站，按攻击视频 → 验证视频 → 交互验证 → 实验结果 → 论文与 BibTeX 的顺序展示。采用 v38 Demo 的图标和视频，字体、封面、WASM 与证明文件均随网站托管。
+独立的英文项目网站，按攻击视频 → 验证视频 → 交互验证 → 性能 → 论文与 BibTeX 的顺序展示。采用 v38 Demo 的图标和视频，字体、封面、WASM 与证明文件均随网站托管。
 
 ## 本地运行
 
@@ -104,7 +104,7 @@ git push -u origin main
 | `scripts/serve.mjs` / `scripts/build.mjs` / `scripts/check.mjs` | 静态预览、构建与检查 |
 | `scripts/generate-proofs.mjs` / `scripts/prove.py` | 离线证明生成与公开证据导出 |
 
-网页实验结果来自论文 [VeriRouter: Towards Verifiable LLM Routing](https://arxiv.org/abs/2610.17431) §6。交互区域显示访客浏览器实际测得的验证耗时。
+网页 Performance 区域来自论文 [VeriRouter: Towards Verifiable LLM Routing](https://arxiv.org/abs/2610.17431) §6 的原生基准平均值。两栏数据分别展示客户端验证（fresh selection 11.91 ms、session-pinned 后续轮次 7.04 ms）、两份 ZK proof 大小（0.15 / 0.14 MiB）与 backend 签名（3.84 ms、0.145 KiB）。增量延迟区分别标明 session-pinned 的 +0.11 s / 0.38% 和 per-turn 的 +4.08 s / 14.24%，不以包含模型推理的总耗时代表验证开销。证明生成与模型推理重叠；完整生成时间和实验配置见论文。交互区域单独显示访客浏览器实际测得的验证耗时。
 
 ## 重建 WASM
 

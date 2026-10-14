@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
-  <title id="title">VeriRouter verification demo — Make OpenRouter more open</title>
-  <desc id="desc">Make OpenRouter more open. A client connects through VeriRouter to a backend model. Four checks verify request integrity, response integrity, model eligibility, and model identity.</desc>
+  <title id="title">VeriRouter verification demo — Make the router prove it</title>
+  <desc id="desc">Make the router prove it. A client connects through VeriRouter to a backend model. Four checks verify request integrity, response integrity, model eligibility, and model identity.</desc>
   <defs>
     <symbol id="laptop" viewBox="0 0 24 24">
       <path d="M3 19h18M5 7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7"/>
@@ -26,33 +26,33 @@
   </defs>
   <rect width="1920" height="1080" fill="#0b141c"/>
   <g font-family="Arial, Helvetica, sans-serif">
-    <text x="120" y="87" fill="#82dec2" font-size="42" font-weight="700" letter-spacing="-.8">VeriRouter</text>
-    <text x="1800" y="85" text-anchor="end" fill="#82dec2" font-size="36">Verification demo</text>
+    <text x="120" y="87" fill="#8ac8fa" font-size="42" font-weight="700" letter-spacing="-.8">VeriRouter</text>
+    <text x="1800" y="85" text-anchor="end" fill="#8ac8fa" font-size="36">Verification demo</text>
     <path d="M120 126h1680" stroke="#2a3b48" stroke-width="2"/>
-    <text x="113" y="270" fill="#e8f1f8" font-size="112" font-weight="700" letter-spacing="-4">Make OpenRouter</text>
-    <text x="113" y="399" fill="#82dec2" font-size="112" font-weight="700" letter-spacing="-4">more open.</text>
+    <text x="113" y="270" fill="#e8f1f8" font-size="112" font-weight="700" letter-spacing="-4">Make the router</text>
+    <text x="113" y="399" fill="#8ac8fa" font-size="112" font-weight="700" letter-spacing="-4">prove it.</text>
   </g>
   <g fill="none" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
     <use href="#laptop" x="255" y="530" width="190" height="190" stroke="#d3e3f0"/>
-    <use href="#router" x="865" y="530" width="190" height="190" stroke="#82dec2"/>
+    <use href="#router" x="865" y="530" width="190" height="190" stroke="#8ac8fa"/>
     <use href="#provider" x="1475" y="530" width="190" height="190" stroke="#d3e3f0"/>
   </g>
   <g fill="none" stroke="#667f92" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M500 628h290m-20-20 20 20-20 20M1110 628h290m-20-20 20 20-20 20"/>
   </g>
-  <circle cx="1042" cy="704" r="27" fill="#0b141c" stroke="#82dec2" stroke-width="4"/>
-  <path d="m1029 704 9 9 17-18" fill="none" stroke="#82dec2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="1042" cy="704" r="27" fill="#0b141c" stroke="#8ac8fa" stroke-width="4"/>
+  <path d="m1029 704 9 9 17-18" fill="none" stroke="#8ac8fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   <g font-family="Arial, Helvetica, sans-serif" font-size="46" text-anchor="middle">
     <text x="350" y="794" fill="#d3e3f0">Client</text>
-    <text x="960" y="794" fill="#82dec2">VeriRouter</text>
+    <text x="960" y="794" fill="#8ac8fa">VeriRouter</text>
     <text x="1570" y="794" fill="#d3e3f0">Backend model</text>
   </g>
   <path d="M120 867h1680" fill="none" stroke="#2a3b48" stroke-width="2"/>
   <g fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <use href="#rewrite" x="298" y="905" width="64" height="64" stroke="#82dec2"/>
-    <use href="#certificate" x="718" y="905" width="64" height="64" stroke="#82dec2"/>
-    <use href="#selection" x="1138" y="905" width="64" height="64" stroke="#82dec2"/>
-    <use href="#shield-check" x="1558" y="905" width="64" height="64" stroke="#82dec2"/>
+    <use href="#rewrite" x="298" y="905" width="64" height="64" stroke="#8ac8fa"/>
+    <use href="#certificate" x="718" y="905" width="64" height="64" stroke="#8ac8fa"/>
+    <use href="#selection" x="1138" y="905" width="64" height="64" stroke="#8ac8fa"/>
+    <use href="#shield-check" x="1558" y="905" width="64" height="64" stroke="#8ac8fa"/>
   </g>
   <g font-family="Arial, Helvetica, sans-serif" fill="#e8f1f8" font-size="36" text-anchor="middle">
     <text x="330" y="1020">Request integrity</text>
