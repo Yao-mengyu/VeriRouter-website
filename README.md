@@ -50,16 +50,3 @@ and the complete verification time after loading the evidence and WASM.
 The proofs keep the router's semantic index and rewrite banks private.
 Read the [paper](https://arxiv.org/abs/2610.17431) for the construction and benchmarks,
 or explore the [implementation](https://github.com/Yao-mengyu/VeriRouter-release).
-
-## Run locally
-
-Requires Node.js 20 or later. Run `npm run dev`, then open <http://localhost:4173>.
-On macOS, `Preview.command` also starts and opens a local preview.
-
-## Build and deploy
-
-Run `npm run build` to generate `dist/`, or `npm run preview` to preview the build.
-GitHub Pages automatically builds and deploys pushes to `main` through GitHub Actions.
-For another static host, publish `dist/`; set `SITE_URL` when building for its URL.
-See [GitHub's guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
-to connect a custom domain.
