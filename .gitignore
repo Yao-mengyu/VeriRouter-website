@@ -1,0 +1,15 @@
+dist/
+node_modules/
+.DS_Store
+.env
+.env.*
+!.env.example
+.qa/
+.local/
+server/artifact/
+__pycache__/
+*.log
+.vercel/
+.netlify/
+
+verifier/target/

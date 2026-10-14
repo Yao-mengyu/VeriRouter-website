@@ -1,0 +1,20 @@
+{
+  "name": "verirouter-project-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VeriRouter research project website with live ZK proving and browser verification.",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs dist",
+    "setup:prover": "node scripts/setup-prover.mjs",
+    "prepare:server": "node scripts/prepare-server.mjs",
+    "serve": "node scripts/serve.mjs dist"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

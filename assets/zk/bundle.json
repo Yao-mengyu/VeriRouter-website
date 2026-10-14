@@ -1,0 +1,123 @@
+{
+  "version": "verirouter-browser-fixture/v1",
+  "source_commit": "8f74110b1cd0e88f03341c87c41c3ae221a6aa45",
+  "fixture_description": "Artifact small component demo; deterministic MT-Bench-101 response and a simulated provider.",
+  "proofs": {
+    "selection": {
+      "proof": "selection.proof",
+      "verifier": "selection.verifier",
+      "verifier_sha256": "362a6b719e4072497727d583b631826a1dd2d9fca819387112dec4efe9fb3e7f",
+      "public_inputs": [
+        "17147361829821702615",
+        "16955294300642696500",
+        "16756192580408414596",
+        "14570328536953362219",
+        "6958556748292607317",
+        "11452137868233395724",
+        "396598074952479041",
+        "14907490929169864169",
+        "13434930219881587440",
+        "4868941842341011558",
+        "3893349285164258146",
+        "11073895996118247496",
+        "23",
+        "0",
+        "0",
+        "2",
+        "1"
+      ]
+    },
+    "rewrite": {
+      "proof": "rewrite.proof",
+      "verifier": "rewrite.verifier",
+      "verifier_sha256": "7f7c2559da04270286412296fe47b6f3003af048fc23edaf2cbcf107ab828ad9",
+      "public_inputs": [
+        "2662056197437914529",
+        "12576615941594383992",
+        "307473005564017551",
+        "11934602191921571854",
+        "14029924283175279684",
+        "16636009727327909389",
+        "1839064619454097509",
+        "12534617707604822297",
+        "2",
+        "13375725816291897411",
+        "5416224588324331733",
+        "44158071034575369",
+        "3286265264277685759",
+        "3",
+        "16638252032408262611",
+        "1170808170881375436",
+        "16038814253995750786",
+        "7965002575771487044"
+      ]
+    }
+  },
+  "certificate": {
+    "version": "serving_certificate_v1",
+    "signature_algorithm": "ed25519",
+    "digest_algorithm": "sha256",
+    "statement": {
+      "rid": "demo-rid-001",
+      "model": "23",
+      "request_commitment_scheme": "poseidon-hashout4-request-commitment-v1",
+      "request_commitment": [
+        "16638252032408262611",
+        "1170808170881375436",
+        "16038814253995750786",
+        "7965002575771487044"
+      ],
+      "response_hash": "sha256:41fd72d9fb83c087d37ec774efc5e2b66f52de03f371b7603f1e64a04fe535a9",
+      "serving_digest": "sha256:41ece766cdef07eaa4055c088d2eb42768e8672b6a8a6a1b483e377e18ff697c"
+    },
+    "signature": {
+      "encoding": "base64",
+      "value": "DqTtAhFuXwFl5mT0i9JRlrbZAx/CoJXrvaVDNtSXAQ7x+Cd0DvPCnLp+6BBlTu4S+XrozPNYmnelqY+nmVOMCQ=="
+    }
+  },
+  "trusted_provider_public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAsFbnrxuPTFV2Y+GimFmoweebPm2RzH6bzPLQrzRVPsY=\n-----END PUBLIC KEY-----\n",
+  "trusted_provider_fingerprint": "sha256:4c20c6665050d8c4b7ed207c56fe6d9296ae941f17f37dba00a27ea5edbdd27d",
+  "response": "Based on the given information, A is the tallest among the three people.",
+  "bindings": {
+    "request_id": "demo-rid-001",
+    "selected_model": "23",
+    "route_client_request_hash": [
+      "13375725816291897411",
+      "5416224588324331733",
+      "44158071034575369",
+      "3286265264277685759"
+    ],
+    "rewrite_client_request_hash": [
+      "13375725816291897411",
+      "5416224588324331733",
+      "44158071034575369",
+      "3286265264277685759"
+    ],
+    "rewrite_request_commitment": [
+      "16638252032408262611",
+      "1170808170881375436",
+      "16038814253995750786",
+      "7965002575771487044"
+    ],
+    "route_query_hash": [
+      "6958556748292607317",
+      "11452137868233395724",
+      "396598074952479041",
+      "14907490929169864169"
+    ]
+  },
+  "native_chain_checks": {
+    "rid_match": true,
+    "rid_unused": true,
+    "client_request_hash_match": true,
+    "encoder_binding_digest_match": true,
+    "request_commitment_match": true,
+    "backend_id_match": true,
+    "backend_registry_public_key_match": true,
+    "execution_signature_verified": true,
+    "execution_signature_verified_by_client": true,
+    "rewrite_proof_verified_by_client": true,
+    "route_proof_verified_by_client": true,
+    "response_hash_match": true
+  }
+}
