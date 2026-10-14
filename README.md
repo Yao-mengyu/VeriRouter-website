@@ -36,9 +36,9 @@ then see VeriRouter detect the same attacks in the
 3. See which checks pass or fail, with measured browser verification times.
    Normal serving passes; the altered serving statements are rejected.
 
-The browser verifies real, offline-generated Plonky2 zero-knowledge proofs
-and Ed25519 signatures. It reports both proof times, certificate verification,
-and the complete verification time after loading the evidence and WASM.
+The browser verifies offline-generated Plonky2 zero-knowledge proofs and
+Ed25519 signatures. It shows the verification results and measured client
+verification time.
 
 ## How it works
 
