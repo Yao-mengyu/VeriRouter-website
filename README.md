@@ -6,13 +6,13 @@ An LLM router can change your prompt, answer, model choice, and model identity.
 VeriRouter makes those hidden steps verifiable while keeping the router's
 semantic index and rewrite banks private.
 
-### [→ Try the verifier](https://yao-mengyu.github.io/VeriRouter-website/#interactive)
+### [→ Try the verifier](https://verirouter.org/#interactive)
 
-[Project website](https://yao-mengyu.github.io/VeriRouter-website/) ·
+[Project website](https://verirouter.org/) ·
 [Paper](https://arxiv.org/abs/2610.17431) ·
 [Code](https://github.com/Yao-mengyu/VeriRouter-release)
 
-[![Watch the VeriRouter attack demo](assets/attack-cover.png)](https://yao-mengyu.github.io/VeriRouter-website/#attack)
+[![Watch the VeriRouter attack demo](assets/attack-cover.png)](https://verirouter.org/#attack)
 
 ## Four attacks on one request
 
@@ -23,13 +23,13 @@ Follow a toothache question through the router and see what changes:
 - **Wrong model selection:** serve the request with an ineligible model.
 - **Model identity spoofing:** claim that a different model produced the answer.
 
-Watch the [attack demo](https://yao-mengyu.github.io/VeriRouter-website/#attack),
+Watch the [attack demo](https://verirouter.org/#attack),
 then see VeriRouter detect the same attacks in the
-[verification demo](https://yao-mengyu.github.io/VeriRouter-website/#verification).
+[verification demo](https://verirouter.org/#verification).
 
 ## Verify a request
 
-1. Open the [interactive demo](https://yao-mengyu.github.io/VeriRouter-website/#interactive)
+1. Open the [interactive demo](https://verirouter.org/#interactive)
    and choose **Normal serving** or an attack scenario.
 2. Click **Verify** to check the proofs, certificate, and API payload bindings.
    Changing scenarios resets the result and waits for another click.
