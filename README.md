@@ -6,6 +6,8 @@
 
 需要 Node.js 20+，无需安装 npm 包：
 
+Mac 上双击 `Preview.command` 可自动选择空闲端口并打开本地 HTTP 网站，使用完整交互；在打开的终端按 Ctrl+C 关闭预览。直接打开 `index.html` 可浏览页面和视频，交互验证请通过预览启动器或下面的命令运行。
+
 ```sh
 npm run dev
 ```
@@ -91,7 +93,8 @@ git push -u origin main
 | 路径 | 用途 |
 | --- | --- |
 | `index.html` / `styles.css` | 叙事、章节排版与响应式布局 |
-| `app.js` | 视频播放、交互验证、计时结果与 BibTeX 复制 |
+| `video-player.js` | 独立视频播放控制，支持直接打开 HTML |
+| `app.js` | 交互验证、计时结果与 BibTeX 复制 |
 | `evidence.js` | 展示与验证共用的场景请求和回答 |
 | `verifier-worker.js` | 浏览器中的 Plonky2 / Ed25519 验证与计时 |
 | `assets/zk/` | 公开 proofs、verifier keys、certificate、WASM 与绑定数据 |
@@ -102,6 +105,7 @@ git push -u origin main
 | `data/verifier-profile.json` | 固定医疗请求、公开查询编码与模型目录 |
 | `assets/fonts/` / `assets/Tabler-LICENSE.txt` | 自托管字体与图标许可证 |
 | `scripts/serve.mjs` / `scripts/build.mjs` / `scripts/check.mjs` | 静态预览、构建与检查 |
+| `Preview.command` / `scripts/open-preview.mjs` | Mac 双击启动本地 HTTP 预览 |
 | `scripts/generate-proofs.mjs` / `scripts/prove.py` | 离线证明生成与公开证据导出 |
 
 网页 Performance 区域来自论文 [VeriRouter: Towards Verifiable LLM Routing](https://arxiv.org/abs/2610.17431) §6 的原生基准平均值。两栏数据分别展示客户端验证（fresh selection 11.91 ms、session-pinned 后续轮次 7.04 ms）、两份 ZK proof 大小（0.15 / 0.14 MiB）与 backend 签名（3.84 ms、0.145 KiB）。增量延迟区分别标明 session-pinned 的 +0.11 s / 0.38% 和 per-turn 的 +4.08 s / 14.24%，不以包含模型推理的总耗时代表验证开销。证明生成与模型推理重叠；完整生成时间和实验配置见论文。交互区域单独显示访客浏览器实际测得的验证耗时。

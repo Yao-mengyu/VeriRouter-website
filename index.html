@@ -14,6 +14,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/inter-tight.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="styles.css">
+  <script src="video-player.js" defer></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
@@ -90,14 +91,12 @@
 
     <section class="chapter container" id="attack" aria-labelledby="attack-title">
       <div class="chapter-heading"><p class="chapter-label"><span>01</span> Attack demo</p><h2 id="attack-title">The router can <span class="attack-accent">cheat.</span></h2><p>A toothache question becomes a sponsored recommendation or an answer from the wrong model. Our demo exposes the router actions behind these outcomes.</p></div>
-      <div class="film-frame"><video id="attack-player" controls playsinline preload="none" poster="assets/attack-cover.png" aria-label="Full attack demo"><source src="assets/media/attacks-all.mp4" type="video/mp4"></video><button class="film-play" data-play="attack-player" aria-label="Play the attack demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
-      <div class="film-meta"><span>Attack walkthrough</span><span>5:29</span></div>
+      <div class="film-frame"><video id="attack-player" controls playsinline preload="none" poster="assets/attack-cover.png" aria-label="Full attack demo"><source src="assets/media/attacks-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="attack-player" aria-label="Play the attack demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
     </section>
 
     <section class="chapter container" id="verification" aria-labelledby="verification-title">
       <div class="chapter-heading"><p class="chapter-label"><span>02</span> Verification demo</p><h2 id="verification-title">Make the router <span class="verification-accent">prove it.</span></h2><p>Our framework, VeriRouter, uses zero-knowledge proofs to verify model eligibility and endorsed request rewriting. A provider-signed serving certificate authenticates the model and its answer. The router’s semantic index and rewrite banks stay private.</p></div>
-      <div class="film-frame"><video id="verification-player" controls playsinline preload="none" poster="assets/verification-cover.png" aria-label="Full VeriRouter verification demo"><source src="assets/media/verifications-all.mp4" type="video/mp4"></video><button class="film-play" data-play="verification-player" aria-label="Play the verification demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
-      <div class="film-meta"><span>Verification walkthrough</span><span>5:49</span></div>
+      <div class="film-frame"><video id="verification-player" controls playsinline preload="none" poster="assets/verification-cover.png" aria-label="Full VeriRouter verification demo"><source src="assets/media/verifications-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="verification-player" aria-label="Play the verification demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
     </section>
 
     <section class="chapter container" id="interactive" aria-labelledby="interactive-title">

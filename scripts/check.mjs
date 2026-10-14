@@ -9,7 +9,8 @@ const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const css = await readFile(path.join(root, 'styles.css'), 'utf8');
 const js = await readFile(path.join(root, 'app.js'), 'utf8');
 assert(/<script\b[^>]*type="module"[^>]*src="app\.js"/.test(html), 'The app must load as an ES module');
-for (const file of ['app.js', 'evidence.js', 'verifier-worker.js', 'scripts/serve.mjs', 'scripts/setup-prover.mjs', 'scripts/generate-proofs.mjs']) execFileSync(process.execPath, ['--check', path.join(root, file)]);
+assert(/<script\b[^>]*src="video-player\.js"[^>]*defer/.test(html), 'Playback must load independently of the verifier module');
+for (const file of ['app.js', 'video-player.js', 'evidence.js', 'verifier-worker.js', 'scripts/serve.mjs', 'scripts/open-preview.mjs', 'scripts/setup-prover.mjs', 'scripts/generate-proofs.mjs']) execFileSync(process.execPath, ['--check', path.join(root, file)]);
 const files = [...html.matchAll(/(?:src|href|poster)="([^"#]+)"/g)].map((match) => match[1]);
 for (const file of files.filter((file) => !/^(https?:|mailto:|data:)/.test(file))) {
   assert((await stat(path.resolve(root, file.split('#')[0]))).isFile(), `Missing asset: ${file}`);

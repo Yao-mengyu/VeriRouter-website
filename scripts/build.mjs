@@ -7,7 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const destination = path.join(root, 'dist');
 await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
-for (const file of ['index.html', 'styles.css', 'app.js', 'evidence.js', 'verifier-worker.js', 'assets', 'data', '.nojekyll', '_headers', 'robots.txt']) {
+for (const file of ['index.html', 'styles.css', 'app.js', 'video-player.js', 'evidence.js', 'verifier-worker.js', 'assets', 'data', '.nojekyll', '_headers', 'robots.txt']) {
   await cp(path.join(root, file), path.join(destination, file), { recursive: true });
 }
 if (process.env.SITE_URL) {
