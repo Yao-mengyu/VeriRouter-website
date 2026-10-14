@@ -6,7 +6,6 @@ node_modules/
 !.env.example
 .qa/
 .local/
-server/artifact/
 __pycache__/
 *.log
 .vercel/

@@ -8,7 +8,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const css = await readFile(path.join(root, 'styles.css'), 'utf8');
 const js = await readFile(path.join(root, 'app.js'), 'utf8');
-for (const file of ['app.js', 'verifier-worker.js', 'scripts/serve.mjs', 'server/api.mjs', 'scripts/setup-prover.mjs', 'scripts/prepare-server.mjs']) execFileSync(process.execPath, ['--check', path.join(root, file)]);
+assert(/<script\b[^>]*type="module"[^>]*src="app\.js"/.test(html), 'The app must load as an ES module');
+for (const file of ['app.js', 'evidence.js', 'verifier-worker.js', 'scripts/serve.mjs', 'scripts/setup-prover.mjs', 'scripts/generate-proofs.mjs']) execFileSync(process.execPath, ['--check', path.join(root, file)]);
 const files = [...html.matchAll(/(?:src|href|poster)="([^"#]+)"/g)].map((match) => match[1]);
 for (const file of files.filter((file) => !/^(https?:|mailto:|data:)/.test(file))) {
   assert((await stat(path.resolve(root, file.split('#')[0]))).isFile(), `Missing asset: ${file}`);
@@ -28,7 +29,7 @@ for (const film of ['attacks-all', 'verifications-all']) {
   assert((await stat(path.join(root, `assets/media/${film}.mp4`))).size > 1000000, `Missing original film: ${film}`);
 
 }
-for (const file of ['assets/verification-poster.jpg', 'assets/social-card.png', 'assets/fonts/Inter-Tight-OFL.txt', 'assets/fonts/IBM-Plex-Mono-OFL.txt']) await stat(path.join(root, file));
+for (const file of ['assets/attack-cover.png', 'assets/verification-cover.png', 'assets/social-card.png', 'assets/fonts/Inter-Tight-OFL.txt', 'assets/fonts/IBM-Plex-Mono-OFL.txt']) await stat(path.join(root, file));
 const bundle = JSON.parse(await readFile(path.join(root, 'assets/zk/bundle.json'), 'utf8'));
 for (const name of ['selection', 'rewrite']) {
   for (const key of ['proof', 'verifier']) await stat(path.join(root, 'assets/zk', bundle.proofs[name][key]));

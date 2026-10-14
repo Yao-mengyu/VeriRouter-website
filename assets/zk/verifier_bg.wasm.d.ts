@@ -2,6 +2,8 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const decode_public_inputs: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+export const hash_client_request: (a: number, b: number) => [number, number, number, number];
+export const hash_query: (a: number, b: number, c: number) => [number, number, number, number];
 export const verify_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number, number, number];
 export const __wbindgen_externrefs: WebAssembly.Table;
 export const __wbindgen_malloc: (a: number, b: number) => number;

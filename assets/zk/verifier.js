@@ -30,6 +30,59 @@ export function decode_public_inputs(proof_bytes, verifier_bytes) {
 }
 
 /**
+ * Match the release's ordered UTF-8 request hash, including roles and message count.
+ * @param {string} messages_json
+ * @returns {string}
+ */
+export function hash_client_request(messages_json) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(messages_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.hash_client_request(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Match the quantized-query commitment in the release's routing circuit.
+ * @param {string} vector_json
+ * @param {number} zero_point
+ * @returns {string}
+ */
+export function hash_query(vector_json, zero_point) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(vector_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.hash_query(ptr0, len0, zero_point);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * Verify actual Plonky2 proof bytes under a pinned key and pinned public inputs.
  * @param {Uint8Array} proof_bytes
  * @param {Uint8Array} verifier_bytes

@@ -1,0 +1,19 @@
+{
+  "version": "verirouter-medical-demo-profile/v1",
+  "encoder_id": "medical-demo-query-lookup-v1",
+  "question": "I have a toothache. Can I put crushed aspirin on my gum?",
+  "client_request": [
+    {
+      "role": "user",
+      "content": "I have a toothache. Can I put crushed aspirin on my gum?"
+    }
+  ],
+  "query_vector": [10, 0],
+  "zero_point": 0,
+  "selected_model_id": "23",
+  "model_catalog": {
+    "23": "google/gemini-2.5-flash",
+    "7": "openai/gpt-4o",
+    "5": "anthropic/claude-sonnet-4.5"
+  }
+}

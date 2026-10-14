@@ -3,7 +3,6 @@ import { readFile, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { handleApi, stopProver } from '../server/api.mjs';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const root = path.resolve(project, process.argv[2] || '.');
@@ -12,9 +11,8 @@ const types = { '.wasm':'application/wasm', '.html':'text/html; charset=utf-8', 
 const server = http.createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    if (await handleApi(request, response, pathname)) return;
     if (!['GET', 'HEAD'].includes(request.method)) { response.writeHead(405); response.end(); return; }
-    if (!/^(?:\/(?:index\.html|styles\.css|app\.js|verifier-worker\.js|robots\.txt)?|\/(?:assets|data)\/[^.][^\0]*)$/.test(pathname)
+    if (!/^(?:\/(?:index\.html|styles\.css|app\.js|evidence\.js|verifier-worker\.js|robots\.txt)?|\/(?:assets|data)\/[^.][^\0]*)$/.test(pathname)
       || pathname.split('/').some((part) => part.startsWith('.'))) { response.writeHead(404); response.end('Not found'); return; }
     const filename = path.resolve(root, `.${pathname.endsWith('/') ? `${pathname}index.html` : pathname}`);
     if (!filename.startsWith(`${root}${path.sep}`)) { response.writeHead(403); response.end('Forbidden'); return; }
@@ -34,4 +32,4 @@ const server = http.createServer(async (request, response) => {
   } catch { response.writeHead(404, { 'Content-Type':'text/plain; charset=utf-8' }); response.end('Not found'); }
 });
 server.listen(port, process.env.HOST || '127.0.0.1', () => console.log(`VeriRouter: http://localhost:${port}`));
-for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => { stopProver(); server.close(); });
+for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => { server.close(); });

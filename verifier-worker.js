@@ -1,4 +1,5 @@
-import init, { verify_proof } from './assets/zk/verifier.js';
+import init, { hash_client_request, hash_query, verify_proof } from './assets/zk/verifier.js';
+import { exampleFor } from './evidence.js';
 
 const encoder = new TextEncoder();
 const hex = (bytes) => Array.from(new Uint8Array(bytes), (x) => x.toString(16).padStart(2, '0')).join('');
@@ -17,6 +18,12 @@ const field = (bytes) => {
   new DataView(prefix.buffer).setUint32(0, bytes.length, false);
   return concatenate(prefix, bytes);
 };
+const hashoutBytes = (limbs) => {
+  const result = new Uint8Array(32);
+  const view = new DataView(result.buffer);
+  limbs.forEach((limb, index) => view.setBigUint64(index * 8, BigInt(limb), false));
+  return result;
+};
 async function loadBytes(file) {
   const response = await fetch(new URL(`./assets/zk/${file}`, import.meta.url));
   if (!response.ok) throw new Error(`Unable to load ${file} (${response.status})`);
@@ -25,9 +32,19 @@ async function loadBytes(file) {
 let fixturePromise;
 async function fixture() {
   fixturePromise ||= (async () => {
-    const response = await fetch(new URL('./assets/zk/bundle.json', import.meta.url));
-    if (!response.ok) throw new Error('Unable to load the public fixture');
-    const bundle = await response.json();
+    const [response, profileResponse] = await Promise.all([
+      fetch(new URL('./assets/zk/bundle.json', import.meta.url)),
+      fetch(new URL('./data/verifier-profile.json', import.meta.url))
+    ]);
+    if (!response.ok || !profileResponse.ok) throw new Error('Unable to load the saved evidence');
+    const [bundle, profile] = await Promise.all([response.json(), profileResponse.json()]);
+    if (bundle.question !== profile.question || !same(bundle.client_request, profile.client_request)
+      || !same(bundle.model_catalog, profile.model_catalog)
+      || bundle.bindings.selected_model !== profile.selected_model_id
+      || bundle.selected_model_name !== profile.model_catalog[profile.selected_model_id]
+      || !same(bundle.query_vector, profile.query_vector) || bundle.zero_point !== profile.zero_point) {
+      throw new Error('The saved evidence does not match the verifier profile');
+    }
     await init({ module_or_path: await loadBytes('verifier_bg.wasm') });
     const artifacts = {};
     for (const name of ['selection', 'rewrite']) {
@@ -36,69 +53,59 @@ async function fixture() {
       if (await sha(verifier) !== record.verifier_sha256) throw new Error(`Pinned ${name} verifier key mismatch`);
       artifacts[name] = { proof, verifier };
     }
-    return { bundle, artifacts };
+    return { bundle, profile, artifacts };
   })();
   return fixturePromise;
 }
 
-async function generatedFixture(data, pinned) {
-  const url = new URL(data.bundleUrl, import.meta.url);
-  if (url.origin !== self.location.origin || !/\/api\/jobs\/[a-f0-9-]{36}\/bundle\.json$/.test(url.pathname)) throw new Error('Invalid proof-run URL');
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Unable to load the generated evidence');
-  const bundle = await response.json();
-  if (bundle.bindings.request_id !== data.requestId) throw new Error('Request ID mismatch');
-  if (bundle.trusted_provider_public_key_pem !== data.providerKey) throw new Error('Demo issuer key mismatch');
-  const artifacts = {};
-  for (const name of ['selection', 'rewrite']) {
-    const record = bundle.proofs[name];
-    const reference = pinned.bundle.proofs[name];
-    const fixedLength = name === 'selection' ? 17 : 14;
-    if (record.public_inputs.length !== reference.public_inputs.length ||
-      !same(record.public_inputs.slice(0, fixedLength), reference.public_inputs.slice(0, fixedLength))) throw new Error(`Unexpected ${name} public statement`);
-    const load = async (extension) => {
-      const res = await fetch(new URL(`${name}.${extension}`, url));
-      if (!res.ok) throw new Error(`Unable to load generated ${name} ${extension}`);
-      return new Uint8Array(await res.arrayBuffer());
-    };
-    const [proof, verifier] = await Promise.all([load('proof'), load('verifier')]);
-    if (await sha(verifier) !== reference.verifier_sha256) throw new Error(`Pinned ${name} verifier key mismatch`);
-    artifacts[name] = { proof, verifier };
-  }
-  return { bundle, artifacts };
+async function verifyEncoder(bundle, profile, example) {
+  const statement = bundle.encoder_statement;
+  // The small demo uses an exact public lookup; other requests have no entry.
+  const knownRequest = same(example.clientRequest, profile.client_request);
+  const clientHash = JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
+  const queryHash = JSON.parse(hash_query(JSON.stringify(profile.query_vector), profile.zero_point));
+  const digest = await sha(concatenate(
+    encoder.encode('VeriRoute.public_encoder_binding.v1'),
+    field(encoder.encode(bundle.bindings.request_id)),
+    field(encoder.encode(profile.encoder_id)),
+    encoder.encode('hashout'), hashoutBytes(clientHash), hashoutBytes(queryHash)
+  ));
+  return knownRequest && statement.encoder_public === true && statement.encoder_id === profile.encoder_id
+    && same(statement.client_request_hash, clientHash)
+    && same(statement.route_query_hash, queryHash)
+    && same(bundle.proofs.selection.public_inputs.slice(4, 8), queryHash)
+    && same(bundle.bindings.route_client_request_hash, clientHash)
+    && same(bundle.bindings.route_query_hash, queryHash)
+    && statement.encoder_binding_digest === `sha256:${digest}`;
 }
 
-async function verifyServing(bundle, variant) {
-  const certificate = bundle.certificate;
+async function verifyServing(bundle, profile, example, clientHash, rewriteInputs) {
+  const certificate = example.certificate;
   const statement = certificate.statement;
   const bindings = bundle.bindings;
-  const response = variant === 'response' ? `${bundle.response} Tampered.` : bundle.response;
-  const model = variant === 'model' ? 'forged-model' : bindings.selected_model;
-  const responseHash = await sha(encoder.encode(JSON.stringify(response)));
-  const commitment = new Uint8Array(32);
-  const view = new DataView(commitment.buffer);
-  statement.request_commitment.forEach((limb, index) => view.setBigUint64(index * 8, BigInt(limb), false));
+  const responseHash = await sha(encoder.encode(JSON.stringify(example.response)));
   const digest = await sha(concatenate(
     encoder.encode('VeriRouter.serving-certificate.v1'),
     field(encoder.encode(statement.rid)),
     field(encoder.encode(statement.model)),
-    field(commitment),
+    field(hashoutBytes(statement.request_commitment)),
     field(fromHex(statement.response_hash.slice(7)))
   ));
   const der = fromBase64(bundle.trusted_provider_public_key_pem.replace(/-----[^-]+-----|\s/g, ''));
   const key = await crypto.subtle.importKey('spki', der, { name: 'Ed25519' }, false, ['verify']);
   const signature = await crypto.subtle.verify('Ed25519', key, fromBase64(certificate.signature.value), fromHex(digest));
   const selectionInputs = bundle.proofs.selection.public_inputs;
-  const rewriteInputs = bundle.proofs.rewrite.public_inputs;
   const checks = {
     registered_key: `sha256:${await sha(encoder.encode(bundle.trusted_provider_public_key_pem))}` === bundle.trusted_provider_fingerprint,
     certificate_version: certificate.version === 'serving_certificate_v1' && certificate.signature_algorithm === 'ed25519' && certificate.digest_algorithm === 'sha256',
     request_commitment_scheme: statement.request_commitment_scheme === 'poseidon-hashout4-request-commitment-v1',
     request_id: statement.rid === bindings.request_id,
-    model: statement.model === model && selectionInputs[12] === model,
-    client_request: same(bindings.route_client_request_hash, bindings.rewrite_client_request_hash) && same(rewriteInputs.slice(9, 13), bindings.rewrite_client_request_hash),
+    model: statement.model === bindings.selected_model && selectionInputs[12] === statement.model
+      && profile.model_catalog[statement.model] === example.model,
+    client_request: same(bindings.route_client_request_hash, clientHash)
+      && same(bindings.rewrite_client_request_hash, clientHash) && same(rewriteInputs.slice(9, 13), clientHash),
     query: same(selectionInputs.slice(4, 8), bindings.route_query_hash),
-    request_commitment: same(statement.request_commitment, bindings.rewrite_request_commitment) && same(rewriteInputs.slice(14, 18), statement.request_commitment),
+    request_commitment: same(rewriteInputs.slice(14, 18), statement.request_commitment),
     response_hash: statement.response_hash === `sha256:${responseHash}`,
     serving_digest: statement.serving_digest === `sha256:${digest}`,
     signature
@@ -107,31 +114,54 @@ async function verifyServing(bundle, variant) {
 }
 
 self.onmessage = async ({ data }) => {
+  if (data.type === 'warmup') {
+    try { await fixture(); self.postMessage({ type: 'ready' }); }
+    catch (error) { fixturePromise = null; self.postMessage({ type: 'error', message: String(error) }); }
+    return;
+  }
   const variant = data.variant;
-  const result = { variant, proofs: {}, certificate: null, accept: false };
+  if (!['honest', 'request', 'selection', 'rewrite', 'response', 'model'].includes(variant)) return;
+  const result = { variant, runId: data.runId, proofs: {}, certificate: null, accept: false };
   try {
-    const pinned = await fixture();
-    const { bundle, artifacts } = data.bundleUrl ? await generatedFixture(data, pinned) : pinned;
+    const { bundle, profile, artifacts } = await fixture();
+    const example = exampleFor(bundle, variant);
+    const totalStarted = performance.now();
+    let clientHash;
+    let expectedRewriteInputs;
     for (const name of ['selection', 'rewrite']) {
-      self.postMessage({ type: 'progress', variant, part: name });
+      self.postMessage({ type: 'progress', runId: data.runId, variant, part: name });
       const bytes = artifacts[name].proof.slice();
       if (variant === name) bytes[Math.floor(bytes.length / 2)] ^= 1;
       const started = performance.now();
       try {
-        const verified = JSON.parse(verify_proof(bytes, artifacts[name].verifier, JSON.stringify(bundle.proofs[name].public_inputs)));
-        result.proofs[name] = { valid: verified.verified === true, milliseconds: performance.now() - started };
+        const expectedInputs = bundle.proofs[name].public_inputs.slice();
+        let bindingsValid = true;
+        if (name === 'selection') bindingsValid = await verifyEncoder(bundle, profile, example);
+        else {
+          clientHash = JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
+          expectedInputs[8] = String(example.clientRequest.length);
+          expectedInputs.splice(9, 4, ...clientHash);
+          expectedInputs.splice(14, 4, ...example.certificate.statement.request_commitment);
+          expectedRewriteInputs = expectedInputs;
+        }
+        const verified = JSON.parse(verify_proof(bytes, artifacts[name].verifier, JSON.stringify(expectedInputs)));
+        result.proofs[name] = { valid: bindingsValid && verified.verified === true, milliseconds: performance.now() - started };
       } catch (error) {
         result.proofs[name] = { valid: false, milliseconds: performance.now() - started, reason: String(error) };
       }
     }
-    self.postMessage({ type: 'progress', variant, part: 'certificate' });
-    result.certificate = await verifyServing(bundle, variant);
-    result.fixture_response = variant === 'response' ? `${bundle.response} Tampered.` : bundle.response;
-    result.claimed_model = variant === 'model' ? 'forged-model' : bundle.bindings.selected_model;
+    self.postMessage({ type: 'progress', runId: data.runId, variant, part: 'certificate' });
+    const certificateStarted = performance.now();
+    clientHash ||= JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
+    result.certificate = await verifyServing(bundle, profile, example, clientHash, expectedRewriteInputs);
+    result.certificate.milliseconds = performance.now() - certificateStarted;
+    result.total_milliseconds = performance.now() - totalStarted;
+    result.fixture_response = example.response;
+    result.claimed_model = example.model;
     result.accept = result.proofs.selection.valid && result.proofs.rewrite.valid && result.certificate.valid;
     self.postMessage({ type: 'result', ...result });
   } catch (error) {
     fixturePromise = null;
-    self.postMessage({ type: 'error', variant, message: String(error) });
+    self.postMessage({ type: 'error', runId: data.runId, variant, message: String(error) });
   }
 };

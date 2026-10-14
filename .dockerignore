@@ -1,9 +1,0 @@
-.git
-.qa
-.local
-dist
-node_modules
-verifier/target
-.env*
-*.log
-**/__pycache__

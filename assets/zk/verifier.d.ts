@@ -7,6 +7,16 @@
 export function decode_public_inputs(proof_bytes: Uint8Array, verifier_bytes: Uint8Array): string;
 
 /**
+ * Match the release's ordered UTF-8 request hash, including roles and message count.
+ */
+export function hash_client_request(messages_json: string): string;
+
+/**
+ * Match the quantized-query commitment in the release's routing circuit.
+ */
+export function hash_query(vector_json: string, zero_point: number): string;
+
+/**
  * Verify actual Plonky2 proof bytes under a pinned key and pinned public inputs.
  */
 export function verify_proof(proof_bytes: Uint8Array, verifier_bytes: Uint8Array, expected_inputs: string): string;
@@ -16,6 +26,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly decode_public_inputs: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly hash_client_request: (a: number, b: number) => [number, number, number, number];
+    readonly hash_query: (a: number, b: number, c: number) => [number, number, number, number];
     readonly verify_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number, number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

@@ -14,7 +14,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/inter-tight.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <script type="module" src="app.js"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -67,70 +67,88 @@
   <path d="M17 22l5 -5" />
 </symbol></defs></svg>
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="wordmark" href="#" aria-label="VeriRouter home"><svg class="brand-mark icon" aria-hidden="true"><use href="#i-router"/></svg>VeriRouter<span class="wordmark-period"></span></a>
-      <nav aria-label="Main navigation"><a href="#demo">Demo</a><a href="#protocol">Protocol</a><a href="#results">Results</a></nav>
-      <a class="header-paper" href="https://arxiv.org/abs/2610.17431" target="_blank" rel="noopener">Read paper <svg class="icon"><use href="#i-up-right"/></svg></a>
-    </div>
-  </header>
+  <header class="site-header"><div class="container header-inner">
+    <a class="wordmark" href="#main" aria-label="VeriRouter home"><svg class="icon brand-mark" aria-hidden="true"><use href="#i-router"/></svg>VeriRouter</a>
+    <nav aria-label="Main navigation"><a href="#attack">Demos</a><a href="#proof-demo">Try the verifier</a><a href="#paper">Paper</a></nav>
+    <a class="header-code" href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg> Code <svg class="icon small"><use href="#i-up-right"/></svg></a>
+  </div></header>
   <main id="main">
     <section class="hero container" aria-labelledby="hero-title">
-      <div class="hero-copy"><h1 id="hero-title">Make OpenRouter<br><em>more open.</em></h1><p class="hero-lede">Verifiable model selection.<br>Verifiable request rewriting.<br>Authenticated responses.</p><div class="hero-actions"><a class="button button-blue" href="#demo"><svg class="icon"><use href="#i-play"/></svg> Explore the demo</a><a class="text-link" href="https://arxiv.org/abs/2610.17431" target="_blank" rel="noopener">Read the paper <svg class="icon"><use href="#i-up-right"/></svg></a></div></div>
-      <div class="hero-background"><div class="intro-route" aria-label="A client request passes through an LLM router to a model provider"><div><svg class="icon"><use href="#i-laptop"/></svg><span>Client</span></div><svg class="icon intro-arrow"><use href="#i-arrow"/></svg><div class="intro-router"><svg class="icon"><use href="#i-router"/></svg><span>LLM router</span></div><svg class="icon intro-arrow"><use href="#i-arrow"/></svg><div><svg class="icon"><use href="#i-provider"/></svg><span>Models</span></div></div><p class="background-lead">LLM routers decide which model answers your request.</p><p>They select a model, adapt the prompt, and relay the answer through a single API.</p><p class="background-emphasis">But who can verify what happened in the middle?</p></div>
-    </section>
-    <section class="section demo-section container" id="demo" aria-labelledby="demo-title">
-      <div class="section-heading"><div><p class="chapter-kicker"><span>01</span> THE PROBLEM</p><h2 id="demo-title">When the router breaks trust</h2></div><p>A hidden prompt, a changed answer, a substituted model. Watch what the client actually receives.</p></div>
-      <div class="demo-view-tabs"><span id="demo-format-label">Interactive replay</span><button data-view="attack" aria-pressed="false"><svg class="icon"><use href="#i-play"/></svg> Watch full videos</button><button data-view="interactive" aria-pressed="true" hidden>Back to interactive demo <svg class="icon"><use href="#i-arrow"/></svg></button></div>
-      <div id="interactive-view"><div class="demo-shell">
-        <div id="attack-panel" role="region" aria-labelledby="scenario-title">
-          <div class="demo-toolbar"><div class="scenario-picker"><label for="attack-select">Attack scenario</label><select id="attack-select"><option value="request">Prompt injection</option><option value="response">Answer tampering</option><option value="model">Wrong model</option><option value="identity">Identity spoofing</option></select></div><label class="verify-toggle"><input type="checkbox" id="verified-toggle"><span>VeriRouter checks</span></label><button id="replay-button" class="button button-blue" disabled><svg class="icon"><use href="#i-play"/></svg>Play the attack</button></div>
-          <p class="scenario-intro" id="scenario-title">A hidden instruction becomes a product recommendation.</p>
-          <div class="stage-question"><span class="mono">CLIENT REQUEST</span><span id="client-request">Loading recorded trace…</span></div>
-          <div class="serving-stage" aria-label="Animated client, router and model-provider workflow">
-            <div class="stage-topline"><span id="stage-status">The client cannot see what happens in the middle.</span><span class="mono" id="stage-counter">04 ATTACK SCENARIOS</span></div>
-            <div class="stage-canvas">
-              <div class="stage-lane"><span class="lane-arrow arrow-one">›</span><span class="lane-arrow arrow-two">›</span><span class="lane-arrow arrow-three">‹</span><span class="lane-arrow arrow-four">‹</span></div>
-              <div class="stage-actor actor-client" data-node="client"><svg class="icon"><use href="#i-laptop"/></svg><span>CLIENT</span><small>Your application</small></div>
-              <div class="stage-actor actor-router" data-node="router"><svg class="icon"><use href="#i-router"/></svg><span id="router-label">COMPROMISED ROUTER</span><small id="router-subtitle">The hidden trust boundary</small></div>
-              <div class="stage-actor actor-provider" data-node="model"><svg class="icon"><use href="#i-provider"/></svg><span>MODEL PROVIDER</span><small id="provider-model">Gemini 2.5 Flash</small></div>
-              <div id="transport-packet" class="transport-packet"><svg class="icon"><use href="#i-message"/></svg><span id="packet-label">User request</span></div>
-            </div>
-            <div class="stage-evidence" id="stage-evidence"><span class="no-evidence"><svg class="icon"><use href="#i-eye-off"/></svg> No proof of what happened behind the router.</span></div>
-          </div>
-          <div class="terminal-grid"><article class="api-terminal"><div class="terminal-chrome"><span class="traffic-lights"><i></i><i></i><i></i></span><span id="mutation-label">client_request.json</span><span class="terminal-side-label" id="result-label">REQUEST</span></div><div class="terminal-body"><div class="code-diff" id="mutation-content"></div></div><div class="evidence-result" id="evidence-result" aria-live="polite"></div></article></div>
-          <ol class="route-steps" aria-label="Replay progress"><li data-step="0" aria-current="step"><span>01</span> Request</li><li data-step="1"><span>02</span> Router</li><li data-step="2"><span>03</span> Model</li><li data-step="3"><span>04</span> Client check</li></ol>
-          <div class="demo-timeline" aria-hidden="true"><span></span></div>
-        </div>
+      <div class="hero-copy">
+        <h1 id="hero-title">Make OpenRouter<br><em>more open.</em></h1>
+        <p class="hero-story">A router can rewrite your request, choose which model serves it, and modify the answer before it reaches you. <strong>VeriRouter makes these hidden steps verifiable.</strong></p>
+        <div class="hero-actions"><a class="button button-primary" href="#attack"><svg class="icon"><use href="#i-play"/></svg> Watch the demos</a><a class="text-link" href="https://arxiv.org/abs/2610.17431" target="_blank" rel="noopener">Read the paper <svg class="icon"><use href="#i-up-right"/></svg></a></div>
       </div>
-      </div><div id="video-view" hidden><div class="film-layout"><div class="film-main"><div class="film-tabs" role="group" aria-label="Choose walkthrough"><button data-film="attack" aria-pressed="true"><span class="status-dot"></span> The attacks <span class="mono">05:29</span></button><button data-film="verify" aria-pressed="false"><svg class="icon"><use href="#i-shield"/></svg> The verification <span class="mono">05:49</span></button></div><video id="walkthrough-video" controls playsinline preload="none" poster="assets/attacks-poster.jpg" aria-label="Four router attacks, full narrated walkthrough"><source src="assets/media/attacks-all.mp4" type="video/mp4">Your browser does not support HTML video. <a href="assets/media/attacks-all.mp4">Download the film.</a></video><div class="film-caption"><span id="film-description">Four local router attacks using recorded OpenRouter API responses.</span><a id="film-download" href="assets/media/attacks-all.mp4" download><svg class="icon"><use href="#i-download"/></svg> MP4</a></div></div><aside class="chapters" aria-label="Video chapters"><p class="eyebrow">JUMP TO A CHAPTER</p><div id="chapter-list"></div><p class="fine-print">1080p · English narration<br>Original embedded subtitles</p></aside></div></div>
-      <p class="demo-note"><svg class="icon"><use href="#i-file"/></svg><span>Recorded API trace. <a href="data/demo-trace.json" download>Inspect the trace ↗</a></span></p>
-
+      <div class="hero-route" role="img" aria-label="The client sends a request through an LLM router to a backend model, and the response returns through the router.">
+        <div class="route-node"><svg class="icon"><use href="#i-laptop"/></svg><span>Client</span></div>
+        <div class="route-arrows"><svg class="icon"><use href="#i-arrow"/></svg><svg class="icon reverse"><use href="#i-arrow"/></svg></div>
+        <div class="route-node router-node"><svg class="icon"><use href="#i-router"/></svg><span>LLM router</span></div>
+        <div class="route-arrows"><svg class="icon"><use href="#i-arrow"/></svg><svg class="icon reverse"><use href="#i-arrow"/></svg></div>
+        <div class="route-node"><svg class="icon"><use href="#i-provider"/></svg><span>Backend model</span></div>
+      </div>
     </section>
-    <section class="section container" id="protocol" aria-labelledby="protocol-title"><div class="section-heading"><div><p class="chapter-kicker"><span>02</span> THE APPROACH</p><h2 id="protocol-title">Verify the hidden steps</h2></div><p>VeriRouter turns each hidden step into checkable evidence while keeping the router’s semantic index and rewrite banks private.</p></div><div class="protocol-grid"><article><div class="protocol-icon"><svg class="icon"><use href="#i-route"/></svg><span>π<sub>sel</sub></span></div><p class="eyebrow">01 / CONTROL PLANE</p><h3>Prove model eligibility.</h3><p>A zero-knowledge proof checks HNSW semantic search over the committed index. Fresh turns establish eligibility; pinned turns reuse the accepted model.</p><a href="https://arxiv.org/html/2610.17431v1#S5.SS2" target="_blank" rel="noopener">Model selection <svg class="icon"><use href="#i-up-right"/></svg></a></article><article><div class="protocol-icon"><svg class="icon"><use href="#i-message"/></svg><span>π<sub>rw</sub></span></div><p class="eyebrow">02 / DATA PLANE</p><h3>Prove endorsed rewriting.</h3><p>A rewrite proof preserves client messages and permits additions only from committed banks at allowed positions, without disclosing the added private content.</p><a href="https://arxiv.org/html/2610.17431v1#S5.SS3.SSS2" target="_blank" rel="noopener">Request rewriting <svg class="icon"><use href="#i-up-right"/></svg></a></article><article><div class="protocol-icon"><svg class="icon"><use href="#i-shield"/></svg><span>σ<sub>provider</sub></span></div><p class="eyebrow">03 / SERVING BINDING</p><h3>Authenticate the answer.</h3><p>A provider-issued certificate binds the model, processed request, and returned response. The client checks the signature and its bindings to the same serving event.</p><a href="https://arxiv.org/html/2610.17431v1#S5.SS3.SSS1" target="_blank" rel="noopener">Serving certificate <svg class="icon"><use href="#i-up-right"/></svg></a></article></div><div class="integrity-statement"><span class="mono">CLIENT ACCEPTS ONLY IF</span><div><span><svg class="icon"><use href="#i-check"/></svg>Eligible model</span><b>∧</b><span><svg class="icon"><use href="#i-check"/></svg>Endorsed request</span><b>∧</b><span><svg class="icon"><use href="#i-check"/></svg>Authentic response</span></div></div>      <div class="proof-demo" id="proof-demo">
-        <div class="proof-demo-heading"><div><h3>Generate &amp; verify ZK proofs.</h3><p id="proof-demo-description">Generate two fresh ZK proofs and a serving certificate. Your browser checks all three, then you can try changing the evidence.</p></div><a class="text-link" href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg> Prover &amp; verifier ↗</a></div>
-        <div class="proof-controls"><button class="button button-blue" id="run-proof"><svg class="icon"><use href="#i-play"/></svg>Generate &amp; verify</button><span id="proof-timer" class="mono"></span></div>
-        <div class="proof-results" aria-live="polite"><div id="proof-selection"><svg class="icon"><use href="#i-selection"/></svg><span>Selection proof</span><strong>Ready</strong></div><div id="proof-rewrite"><svg class="icon"><use href="#i-rewrite"/></svg><span>Rewrite proof</span><strong>Ready</strong></div><div id="proof-certificate"><svg class="icon"><use href="#i-certificate"/></svg><span>Serving certificate</span><strong>Ready</strong></div></div>
-        <output id="proof-outcome" aria-live="polite">Small example · Plonky2 in ZK mode · demo provider · no API key needed</output>
-        <div class="proof-answer" id="proof-answer" hidden><span class="proof-answer-label">RETURNED ANSWER</span><p id="proof-public-response"></p><span class="mono">Model <span id="proof-public-model"></span> · <span id="proof-run-id"></span></span></div>
-        <div class="tamper-controls" id="tamper-controls" hidden><label for="proof-variant">Now try changing the evidence</label><select id="proof-variant"><option value="honest">Original evidence</option><option value="selection">Change the selection proof</option><option value="rewrite">Change the rewrite proof</option><option value="response">Change the answer</option><option value="model">Change the model identity</option></select><span>Automatically re-verified in your browser</span></div>
-        <details class="proof-details"><summary>Public evidence</summary><p>The browser checks both ZK proofs, the Ed25519 signature, and the request, model, and response bindings. The example uses the release artifact’s small routing and rewrite inputs.</p><a id="proof-download" href="assets/zk/bundle.json" download>Download the evidence bundle ↗</a></details>
-      </div><details class="technical-detail"><summary>Why these proofs are efficient</summary><p>VeriRouter checks priority-queue and monotone-stack traces with a number of constraints linear in trace length. This avoids replaying every mutable queue state while proving semantic-search traversal. <a href="https://arxiv.org/html/2610.17431v1#S4" target="_blank" rel="noopener">Read the construction ↗</a></p></details></section>
 
-    <section class="section results-section" id="results" aria-labelledby="results-title"><div class="container"><div class="results-intro"><p class="chapter-kicker"><span>03</span> THE RESULTS</p><h2 id="results-title">Practical verification overhead.</h2><p>Measured on RouteLLM and MT-Bench-101. <a href="https://arxiv.org/html/2610.17431v1#S6" target="_blank" rel="noopener">Paper §6 ↗</a></p></div><div class="key-results"><article><strong>1,307×</strong><h3>Faster selection proving</h3><p>21.92 s average, compared with SP1.</p></article><article><strong>101×</strong><h3>Faster rewrite proving</h3><p>4.24 s average, compared with Jolt.</p></article><article><strong>+0.11 s</strong><h3>Added latency per turn</h3><p>Session-pinned selection; +4.08 s with fresh selection every turn.</p></article></div><p class="results-context">Proof generation overlaps with inference. Proving time and added serving latency measure different quantities.</p><details class="evaluation-details"><summary>View the measurements and experimental setup</summary><table><thead><tr><th>Component</th><th>Average proving / generation</th><th>Average client verification</th></tr></thead><tbody><tr><td>Selection proof</td><td>21.92 s</td><td>4.87 ms</td></tr><tr><td>Rewrite proof</td><td>4.24 s</td><td>4.58 ms</td></tr><tr><td>Serving certificate</td><td>3.84 ms</td><td>2.47 ms</td></tr></tbody></table><p>32 vCPUs · 256 GiB RAM · 32 threads · ZK mode enabled. Scalability evaluated up to 10M semantic-index nodes and 16K rewrite-bank entries.</p><a href="https://arxiv.org/html/2610.17431v1#S6" target="_blank" rel="noopener">Full evaluation and baselines ↗</a></details></div></section>
-    <section class="section container paper-section" id="paper" aria-labelledby="paper-title"><div class="paper-copy"><p class="chapter-kicker"><span>04</span> THE PAPER</p><h2 id="paper-title">VeriRouter: Towards<br>Verifiable LLM Routing</h2><div class="paper-links"><a class="button button-dark" href="https://arxiv.org/pdf/2610.17431" target="_blank" rel="noopener"><svg class="icon"><use href="#i-file"/></svg> Read the paper <svg class="icon"><use href="#i-up-right"/></svg></a><a class="text-link" href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg> Code <svg class="icon"><use href="#i-up-right"/></svg></a></div><p class="fine-print">arXiv:2610.17431 · October 2026</p></div><details class="citation-box"><summary>BibTeX citation</summary><div><span class="mono">CITE THIS WORK</span><button id="copy-citation" aria-label="Copy BibTeX citation"><svg class="icon"><use href="#i-copy"/></svg><span>Copy BibTeX</span></button></div><pre id="bibtex">@misc{yao2026verirouter,
-  title={VeriRouter: Towards Verifiable
-         LLM Routing},
-  author={Mengyu Yao and Ziqi Zhang and
-          Shaofei Li and Yifeng Cai and
-          Ding Li and Yao Guo and Ning Luo},
+    <section class="chapter container" id="attack" aria-labelledby="attack-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>01</span> Attack demo</p><h2 id="attack-title">What can the router change?</h2><p>Follow a request through attacks on the prompt, answer, model choice, and model identity.</p></div>
+      <div class="film-frame"><video id="attack-player" controls playsinline preload="none" poster="assets/attack-cover.png" aria-label="Full attack demo"><source src="assets/media/attacks-all.mp4" type="video/mp4"></video><button class="film-play" data-play="attack-player" aria-label="Play the attack demo"><svg class="icon"><use href="#i-play"/></svg></button></div>
+      <div class="film-meta"><span>Attack walkthrough</span><span>5:29</span></div>
+    </section>
+
+    <section class="chapter container" id="verification" aria-labelledby="verification-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>02</span> Verification demo</p><h2 id="verification-title">Make the hidden steps verifiable.</h2><p>VeriRouter proves model selection and request rewriting in zero knowledge, then binds the serving event to a provider-signed certificate.</p></div>
+      <div class="film-frame"><video id="verification-player" controls playsinline preload="none" poster="assets/verification-cover.png" aria-label="Full VeriRouter verification demo"><source src="assets/media/verifications-all.mp4" type="video/mp4"></video><button class="film-play" data-play="verification-player" aria-label="Play the verification demo"><svg class="icon"><use href="#i-play"/></svg></button></div>
+      <div class="film-meta"><span>Verification walkthrough</span><span>5:49</span></div>
+    </section>
+
+    <section class="chapter container" id="interactive" aria-labelledby="interactive-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>03</span> Interactive demo</p><h2 id="interactive-title">Try the verifier.</h2><p>Choose a scenario, inspect the API payload, then verify it.</p></div>
+      <div class="verifier-shell" id="proof-demo">
+        <div class="verifier-toolbar"><div class="evidence-picker"><label for="proof-variant">Scenario</label><div class="select-wrap"><select id="proof-variant"><option value="honest">Original</option><option value="request">Request injection</option><option value="rewrite">Altered rewrite proof</option><option value="response">Altered answer</option><option value="selection">Altered selection proof</option><option value="model">Altered model identity</option></select><svg class="icon"><use href="#i-arrow"/></svg></div></div><button class="button button-primary" id="run-proof"><svg class="icon"><use href="#i-shield"/></svg>Verify</button></div>
+        <div class="client-request"><span class="request-label">Client question</span><p id="client-question">I have a toothache. Can I put crushed aspirin on my gum?</p></div>
+        <div class="verifier-route" aria-label="Client, VeriRouter and backend model workflow">
+          <div class="route-node" id="node-client"><svg class="icon"><use href="#i-laptop"/></svg><span>Client</span></div>
+          <div class="route-arrows"><svg class="icon"><use href="#i-arrow"/></svg><svg class="icon reverse"><use href="#i-arrow"/></svg></div>
+          <div class="route-node router-node"><svg class="icon"><use href="#i-router"/></svg><span>VeriRouter</span></div>
+          <div class="route-arrows"><svg class="icon"><use href="#i-arrow"/></svg><svg class="icon reverse"><use href="#i-arrow"/></svg></div>
+          <div class="route-node"><svg class="icon"><use href="#i-provider"/></svg><span>Backend model</span></div>
+        </div>
+        <div class="verifier-workspace">
+          <div class="response-panel"><div class="panel-heading"><h3 id="api-panel-title">Client request</h3></div><pre id="response-json" aria-label="Complete API JSON">Loading request…</pre></div>
+          <div class="checks-panel"><h3>Browser verification</h3><div class="proof-results" aria-live="polite">
+            <div class="proof-row" id="proof-selection"><svg class="icon"><use href="#i-selection"/></svg><div><span>Selection proof</span><strong>Ready</strong></div><span class="proof-time">—</span></div>
+            <div class="proof-row" id="proof-rewrite"><svg class="icon"><use href="#i-rewrite"/></svg><div><span>Rewrite proof</span><strong>Ready</strong></div><span class="proof-time">—</span></div>
+            <div class="proof-row" id="proof-certificate"><svg class="icon"><use href="#i-certificate"/></svg><div><span>Serving certificate</span><strong>Ready</strong></div><span class="proof-time">—</span></div>
+          </div><div class="verification-total"><span>Total verification</span><strong id="proof-total">— <small>ms</small></strong></div></div>
+        </div>
+        <output id="proof-outcome" aria-live="polite">Ready to verify.</output>
+      </div>
+    </section>
+
+    <section class="chapter container" id="results" aria-labelledby="results-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>04</span> Benchmark results</p><h2 id="results-title">Practical verification overhead.</h2><p>Measured on RouteLLM and MT-Bench-101.</p></div>
+      <div class="key-results"><article><strong>1,307×</strong><h3>Faster selection proving</h3><p>21.92 s average, compared with SP1.</p></article><article><strong>101×</strong><h3>Faster rewrite proving</h3><p>4.24 s average, compared with Jolt.</p></article><article><strong>+0.11 s</strong><h3>Added latency per turn</h3><p>With session-pinned selection.</p></article></div>
+      <a class="text-link results-link" href="https://arxiv.org/html/2610.17431v1#S6" target="_blank" rel="noopener">Full evaluation in the paper <svg class="icon"><use href="#i-up-right"/></svg></a>
+    </section>
+
+    <section class="chapter container paper-section" id="paper" aria-labelledby="paper-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>05</span> Paper</p><h2 id="paper-title">VeriRouter: Towards Verifiable LLM Routing</h2><div class="paper-links"><a class="text-link" href="https://arxiv.org/pdf/2610.17431" target="_blank" rel="noopener"><svg class="icon"><use href="#i-file"/></svg> Read the paper <svg class="icon"><use href="#i-up-right"/></svg></a><a class="text-link" href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg> Code <svg class="icon"><use href="#i-up-right"/></svg></a></div></div>
+      <div class="citation-box"><div class="citation-heading"><h3>BibTeX</h3><button id="copy-citation" aria-label="Copy BibTeX citation"><svg class="icon"><use href="#i-copy"/></svg> Copy</button></div><pre id="bibtex">@misc{yao2026verirouter,
+  title={VeriRouter: Towards Verifiable LLM Routing},
+  author={<span class="bib-author">Mengyu Yao</span> and <span class="bib-author">Ziqi Zhang</span> and <span class="bib-author">Shaofei Li</span> and
+          <span class="bib-author">Yifeng Cai</span> and <span class="bib-author">Ding Li</span> and <span class="bib-author">Yao Guo</span> and <span class="bib-author">Ning Luo</span>},
   year={2026},
   eprint={2610.17431},
   archivePrefix={arXiv},
   primaryClass={cs.CR},
   url={https://arxiv.org/abs/2610.17431}
-}</pre><output id="copy-result" class="sr-only" aria-live="polite"></output></details></section>
+}</pre><output id="copy-result" class="sr-only" aria-live="polite"></output></div>
+    </section>
+
+    <section class="chapter container integration-section" id="integration" aria-labelledby="integration-title">
+      <div class="chapter-heading"><p class="chapter-label"><span>06</span> Get started</p><h2 id="integration-title">Integrate VeriRouter into your router.</h2><p>Add verifiable model selection, request rewriting, and authenticated responses to your routing pipeline.</p></div>
+      <div class="integration-actions"><a class="button button-primary" href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg>View code <svg class="icon"><use href="#i-up-right"/></svg></a></div>
+    </section>
   </main>
-  <footer class="site-footer"><div class="container"><a class="wordmark" href="#">VeriRouter<span class="wordmark-period"></span></a><p>Routing should come with evidence.</p><div><a href="https://arxiv.org/abs/2610.17431" target="_blank" rel="noopener">Paper ↗</a><a href="https://github.com/Yao-mengyu/VeriRouter-release" target="_blank" rel="noopener">Code ↗</a><a href="#demo">Films ↑</a></div></div></footer>
+  <footer class="site-footer"><div class="container"><a class="wordmark" href="#main">VeriRouter</a><a class="text-link" href="#main">Back to top <svg class="icon"><use href="#i-arrow"/></svg></a></div></footer>
 </body>
 </html>
