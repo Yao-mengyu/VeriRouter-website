@@ -3,7 +3,7 @@ import { exampleFor } from './evidence.js';
 
 const $ = (selector) => document.querySelector(selector);
 const parts = ['selection', 'rewrite', 'certificate'];
-const variants = new Set(['honest', 'request', ...parts.slice(0, 2), 'response', 'model']);
+const variants = new Set(['honest', 'request', 'response', 'selection', 'model']);
 let bundle;
 let worker;
 let busy = false;
@@ -18,8 +18,8 @@ function renderApi() {
   const variant = $('#proof-variant').value;
   const { question, model, response, clientApiRequest, forwardedApiRequest } = exampleFor(bundle, variant);
   $('#client-question').textContent = question;
-  const isForwarded = variant === 'request' || variant === 'rewrite';
-  const isResponse = !isForwarded && (showResult || variant === 'response' || variant === 'model');
+  const isForwarded = variant === 'request';
+  const isResponse = !isForwarded && (showResult || variant === 'response' || variant === 'selection' || variant === 'model');
   const payload = isForwarded ? forwardedApiRequest : isResponse ? { model, response } : clientApiRequest;
   $('#api-panel-title').textContent = isForwarded ? 'Forwarded request' : isResponse ? 'Returned response' : 'Client request';
   const json = JSON.stringify(payload, null, 2);
@@ -28,7 +28,7 @@ function renderApi() {
   for (const line of json.split('\n')) {
     const row = document.createElement('span');
     row.className = 'json-line';
-    if ((variant === 'model' && line.includes(model))
+    if (((variant === 'selection' || variant === 'model') && line.includes(model))
       || (variant === 'response' && line.includes('CureAll-X'))
       || (variant === 'request' && line.includes('Patient context:'))) row.classList.add('changed-line');
     row.textContent = line;
@@ -116,7 +116,10 @@ async function verifyEvidence() {
           row.querySelector('.proof-time').textContent = `${check.milliseconds.toFixed(1)} ms`;
         }
         $('#proof-total').replaceChildren(document.createTextNode(`${data.total_milliseconds.toFixed(1)} `), Object.assign(document.createElement('small'), {textContent:'ms'}));
-        const failed = variant === 'selection' ? 'Selection proof failed.' : variant === 'rewrite' ? 'Rewrite proof failed.' : variant === 'model' ? 'Model binding failed.' : variant === 'request' ? 'Request binding failed.' : 'Response binding failed.';
+        const failed = variant === 'selection' ? 'Wrong model selection.'
+          : variant === 'model' && !data.proofs.selection.valid ? 'Wrong model selection and false model identity.'
+          : variant === 'model' ? 'False model identity.'
+          : variant === 'request' ? 'Unapproved request rewriting.' : 'The answer was altered.';
         $('#proof-outcome').textContent = data.accept ? 'Verified.' : `Rejected. ${failed}`;
         $('#proof-outcome').dataset.accept = String(data.accept);
         $('#proof-outcome').dataset.variant = variant;

@@ -21,6 +21,40 @@ def public_certificate(payload):
     return certificate
 
 
+def selection_fixture(profile, trace, normal_forwarded):
+    recorded = trace["cases"]["model"]
+    forwarded = copy.deepcopy(recorded["attack_forwarded_request"])
+    model = forwarded["model"]
+    model_id = next((str(key) for key, value in profile["model_catalog"].items()
+                     if value == model), None)
+    backend = recorded["attack_backend_response"]
+    identity = trace["cases"]["identity"]
+    if model_id is None or model_id == str(profile["selected_model_id"]):
+        raise ValueError("The substituted model must have a different pinned catalog ID")
+    if (forwarded["messages"] != normal_forwarded
+            or backend["model"] != model
+            or recorded["delivered_response"]["model"] != model
+            or recorded["delivered_response"]["content"] != backend["content"]
+            or identity["attack_forwarded_request"] != forwarded
+            or identity["attack_backend_response"]["model"] != model
+            or identity["attack_backend_response"]["content"] != backend["content"]
+            or identity["delivered_response"]["content"] != backend["content"]):
+        raise ValueError("Model substitution must preserve the request and recorded Qwen answer")
+    return {"forwarded_api_request": forwarded, "model": model, "model_id": model_id,
+            "response": backend["content"]}
+
+
+def sign_selection_fixture(signature, private_key, public_key, rid, request_commitment, variant):
+    payload, _ = signature.certificate_payload(
+        argparse.Namespace(private_key=str(private_key), public_key=str(public_key),
+                           rid=rid, model=variant["model_id"], verify=True),
+        [int(value) for value in request_commitment], variant["response"],
+    )
+    if payload["verification"]["verified"] is not True:
+        raise RuntimeError("The substituted model's serving certificate signature must verify")
+    return {**copy.deepcopy(variant), "certificate": public_certificate(payload)}
+
+
 def medical_fixture(demo):
     project = Path(__file__).resolve().parents[1]
     profile = json.loads((project / "data/verifier-profile.json").read_text())
@@ -81,6 +115,7 @@ def medical_fixture(demo):
             "response": {"backend_id": model_id, "response": recorded["honest_response"]["content"]},
             "request_variant": {"forwarded_api_request": attack_forwarded,
                                 "response": request_attack["attack_backend_response"]["content"]},
+            "selection_variant": selection_fixture(profile, trace, forwarded),
             "response_variants": response_variants}
 
 
@@ -161,6 +196,10 @@ def main():
     if attack_certificate["verification"]["verified"] is not True:
         raise RuntimeError("The injected request's serving certificate signature must verify")
     request_variant["certificate"] = public_certificate(attack_certificate)
+    selection_variant = sign_selection_fixture(
+        demo.signature, out / "backend_ed25519.pem", out / "backend_ed25519.pub.pem",
+        args.rid, certificate["statement"]["request_commitment"], fixture["selection_variant"],
+    )
     public_key = (out / "backend_ed25519.pub.pem").read_text()
     encoder_statement = copy.deepcopy(route["encoder_statement"])
     for name in ["client_request_hash", "route_query_hash"]:
@@ -178,6 +217,7 @@ def main():
         "selected_model_name": fixture["selected_model_name"],
         "response_variants": fixture["response_variants"],
         "request_variant": request_variant,
+        "selection_variant": selection_variant,
         "encoder_statement": encoder_statement,
         "query_vector": profile["query_vector"],
         "zero_point": profile["zero_point"],

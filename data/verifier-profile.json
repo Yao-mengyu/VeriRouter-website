@@ -14,6 +14,7 @@
   "model_catalog": {
     "23": "google/gemini-2.5-flash",
     "7": "openai/gpt-4o",
-    "5": "anthropic/claude-sonnet-4.5"
+    "5": "anthropic/claude-sonnet-4.5",
+    "29": "qwen/qwen-2.5-7b-instruct"
   }
 }

@@ -102,7 +102,7 @@
     <section class="chapter container" id="interactive" aria-labelledby="interactive-title">
       <div class="chapter-heading"><p class="chapter-label"><span>03</span> Interactive demo</p><h2 id="interactive-title">Try the verifier.</h2></div>
       <div class="verifier-shell" id="proof-demo">
-        <div class="verifier-toolbar"><div class="evidence-picker"><label for="proof-variant">Scenario</label><div class="select-wrap"><select id="proof-variant"><option value="honest">Normal serving</option><option value="request">Request injection</option><option value="rewrite">Altered rewrite proof</option><option value="response">Altered answer</option><option value="selection">Altered selection proof</option><option value="model">Altered model identity</option></select><svg class="icon"><use href="#i-arrow"/></svg></div></div><button class="button button-primary" id="run-proof"><svg class="icon"><use href="#i-shield"/></svg>Verify</button></div>
+        <div class="verifier-toolbar"><div class="evidence-picker"><label for="proof-variant">Scenario</label><div class="select-wrap"><select id="proof-variant"><option value="honest">Normal serving</option><option value="request">Hidden instruction injection</option><option value="response">Answer tampering</option><option value="selection">Wrong model selection</option><option value="model">Model identity spoofing</option></select><svg class="icon"><use href="#i-arrow"/></svg></div></div><button class="button button-primary" id="run-proof"><svg class="icon"><use href="#i-shield"/></svg>Verify</button></div>
         <div class="client-request"><span class="request-label">Client question</span><p id="client-question">I have a toothache. Can I put crushed aspirin on my gum?</p></div>
         <div class="verifier-route" aria-label="Client, VeriRouter and backend model workflow">
           <div class="route-node" id="node-client"><svg class="icon"><use href="#i-laptop"/></svg><span>Client</span></div>
@@ -147,7 +147,7 @@
           <div><dt>Per-turn selection</dt><dd><strong>14.24<small>%</small></strong><span>+4.08 s</span></dd></div>
         </dl>
       </div>
-      <div class="performance-source"><span>Paper benchmark averages</span><a class="text-link" href="https://arxiv.org/html/2610.17431v1#S6" target="_blank" rel="noopener">Evaluation in the paper <svg class="icon"><use href="#i-up-right"/></svg></a></div>
+      <div class="performance-source"><a class="text-link" href="https://arxiv.org/html/2610.17431v1#S6" target="_blank" rel="noopener">Evaluation in the paper <svg class="icon"><use href="#i-up-right"/></svg></a></div>
     </section>
 
     <section class="chapter container paper-section" id="paper" aria-labelledby="paper-title">

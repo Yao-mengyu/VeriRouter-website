@@ -112,7 +112,8 @@
   "model_catalog": {
     "23": "google/gemini-2.5-flash",
     "7": "openai/gpt-4o",
-    "5": "anthropic/claude-sonnet-4.5"
+    "5": "anthropic/claude-sonnet-4.5",
+    "29": "qwen/qwen-2.5-7b-instruct"
   },
   "selected_model_name": "google/gemini-2.5-flash",
   "response_variants": {
@@ -232,5 +233,47 @@
     "rewrite_proof_verified_by_client": true,
     "route_proof_verified_by_client": true,
     "response_hash_match": true
+  },
+  "selection_variant": {
+    "forwarded_api_request": {
+      "model": "qwen/qwen-2.5-7b-instruct",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful medical assistant. Be brief and direct."
+        },
+        {
+          "role": "user",
+          "content": "I have a toothache. Can I put crushed aspirin on my gum?"
+        }
+      ],
+      "temperature": 0.0,
+      "max_tokens": 600
+    },
+    "model": "qwen/qwen-2.5-7b-instruct",
+    "model_id": "29",
+    "response": "Yes, you can put crushed aspirin on your gum to help with pain relief. Mix it with water to form a paste and apply it gently to the affected area. However, if the pain persists or worsens, see a dentist.",
+    "certificate": {
+      "version": "serving_certificate_v1",
+      "signature_algorithm": "ed25519",
+      "digest_algorithm": "sha256",
+      "statement": {
+        "rid": "offline-164f6f91-56a3-41ef-b001-1772bb9ead9e",
+        "model": "29",
+        "request_commitment_scheme": "poseidon-hashout4-request-commitment-v1",
+        "request_commitment": [
+          "1054323717810343132",
+          "4293941897182327669",
+          "9959126688000269280",
+          "4773867715455500460"
+        ],
+        "response_hash": "sha256:9f4961002863a2e0cff75baf7e6e4415d32289cba44d3a2e8439289c56d064da",
+        "serving_digest": "sha256:160c12ef2275a1b7639af4e3694af8a14e0c1e41e4a774a7c6c32a0fb579e9fc"
+      },
+      "signature": {
+        "encoding": "base64",
+        "value": "mncinzTh0ExbZ4Vx6klhydKg3jbqN+ShoGb7PaW6ToecXDxZmpadYT0ioxlE5v3DjxZkLarY6H+XntOhO2e3Cw=="
+      }
+    }
   }
 }

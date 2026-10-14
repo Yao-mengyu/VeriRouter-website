@@ -27,37 +27,37 @@
   <rect width="1920" height="1080" fill="#0b141c"/>
   <g font-family="Arial, Helvetica, sans-serif">
     <text x="120" y="87" fill="#e8f1f8" font-size="42" font-weight="700" letter-spacing="-.8">VeriRouter</text>
-    <text x="1800" y="85" text-anchor="end" fill="#d79aa5" font-size="36">Attack demo</text>
+    <text x="1800" y="85" text-anchor="end" fill="#e58b9a" font-size="36">Attack demo</text>
     <path d="M120 126h1680" stroke="#2a3b48" stroke-width="2"/>
     <text x="113" y="270" fill="#e8f1f8" font-size="112" font-weight="700" letter-spacing="-4">When the router</text>
-    <text x="113" y="399" fill="#d79aa5" font-size="112" font-weight="700" letter-spacing="-4">breaks trust.</text>
+    <text x="113" y="399" fill="#e58b9a" font-size="112" font-weight="700" letter-spacing="-4">breaks trust.</text>
   </g>
   <g fill="none" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
     <use href="#laptop" x="255" y="530" width="190" height="190" stroke="#d3e3f0"/>
-    <use href="#router" x="865" y="530" width="190" height="190" stroke="#d79aa5"/>
+    <use href="#router" x="865" y="530" width="190" height="190" stroke="#e58b9a"/>
     <use href="#provider" x="1475" y="530" width="190" height="190" stroke="#d3e3f0"/>
   </g>
   <g fill="none" stroke="#667f92" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M500 628h290m-20-20 20 20-20 20M1110 628h290m-20-20 20 20-20 20"/>
   </g>
-  <circle cx="1042" cy="704" r="27" fill="#0b141c" stroke="#d79aa5" stroke-width="4"/>
-  <path d="m1033 695 18 18m0-18-18 18" fill="none" stroke="#d79aa5" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="1042" cy="704" r="27" fill="#0b141c" stroke="#e58b9a" stroke-width="4"/>
+  <path d="m1033 695 18 18m0-18-18 18" fill="none" stroke="#e58b9a" stroke-width="4" stroke-linecap="round"/>
   <g font-family="Arial, Helvetica, sans-serif" font-size="46" text-anchor="middle">
     <text x="350" y="794" fill="#d3e3f0">Client</text>
-    <text x="960" y="794" fill="#d79aa5">Router</text>
+    <text x="960" y="794" fill="#e58b9a">Router</text>
     <text x="1570" y="794" fill="#d3e3f0">Backend model</text>
   </g>
   <path d="M120 867h1680" fill="none" stroke="#2a3b48" stroke-width="2"/>
-  <g fill="none" stroke="#d79aa5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="#e58b9a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
     <use href="#edit" x="298" y="905" width="64" height="64"/>
     <use href="#message" x="718" y="905" width="64" height="64"/>
     <use href="#swap" x="1138" y="905" width="64" height="64"/>
     <use href="#eye-off" x="1558" y="905" width="64" height="64"/>
   </g>
   <g font-family="Arial, Helvetica, sans-serif" fill="#e8f1f8" font-size="36" text-anchor="middle">
-    <text x="330" y="1020">Prompt injection</text>
-    <text x="750" y="1020">Answer tampering</text>
-    <text x="1170" y="1020">Model substitution</text>
-    <text x="1590" y="1020">Identity spoofing</text>
+    <text x="330" y="1000"><tspan x="330">Hidden instruction</tspan><tspan x="330" y="1040">injection</tspan></text>
+    <text x="750" y="1000"><tspan x="750">Answer</tspan><tspan x="750" y="1040">tampering</tspan></text>
+    <text x="1170" y="1000"><tspan x="1170">Wrong model</tspan><tspan x="1170" y="1040">selection</tspan></text>
+    <text x="1590" y="1000"><tspan x="1590">Model identity</tspan><tspan x="1590" y="1040">spoofing</tspan></text>
   </g>
 </svg>

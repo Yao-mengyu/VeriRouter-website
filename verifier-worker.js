@@ -79,7 +79,7 @@ async function verifyEncoder(bundle, profile, example) {
     && statement.encoder_binding_digest === `sha256:${digest}`;
 }
 
-async function verifyServing(bundle, profile, example, clientHash, rewriteInputs) {
+async function verifyServing(bundle, profile, example) {
   const certificate = example.certificate;
   const statement = certificate.statement;
   const bindings = bundle.bindings;
@@ -94,18 +94,16 @@ async function verifyServing(bundle, profile, example, clientHash, rewriteInputs
   const der = fromBase64(bundle.trusted_provider_public_key_pem.replace(/-----[^-]+-----|\s/g, ''));
   const key = await crypto.subtle.importKey('spki', der, { name: 'Ed25519' }, false, ['verify']);
   const signature = await crypto.subtle.verify('Ed25519', key, fromBase64(certificate.signature.value), fromHex(digest));
-  const selectionInputs = bundle.proofs.selection.public_inputs;
+  const actualModel = profile.model_catalog[statement.model];
   const checks = {
     registered_key: `sha256:${await sha(encoder.encode(bundle.trusted_provider_public_key_pem))}` === bundle.trusted_provider_fingerprint,
     certificate_version: certificate.version === 'serving_certificate_v1' && certificate.signature_algorithm === 'ed25519' && certificate.digest_algorithm === 'sha256',
     request_commitment_scheme: statement.request_commitment_scheme === 'poseidon-hashout4-request-commitment-v1',
     request_id: statement.rid === bindings.request_id,
-    model: statement.model === bindings.selected_model && selectionInputs[12] === statement.model
-      && profile.model_catalog[statement.model] === example.model,
-    client_request: same(bindings.route_client_request_hash, clientHash)
-      && same(bindings.rewrite_client_request_hash, clientHash) && same(rewriteInputs.slice(9, 13), clientHash),
-    query: same(selectionInputs.slice(4, 8), bindings.route_query_hash),
-    request_commitment: same(rewriteInputs.slice(14, 18), statement.request_commitment),
+    actual_serving_model: typeof actualModel === 'string' && actualModel === example.forwardedApiRequest.model,
+    model: actualModel === example.model,
+    request_commitment: statement.request_commitment.length === 4
+      && statement.request_commitment.every((limb) => BigInt(limb) >= 0n && BigInt(limb) < 18446744069414584321n),
     response_hash: statement.response_hash === `sha256:${responseHash}`,
     serving_digest: statement.serving_digest === `sha256:${digest}`,
     signature
@@ -120,29 +118,30 @@ self.onmessage = async ({ data }) => {
     return;
   }
   const variant = data.variant;
-  if (!['honest', 'request', 'selection', 'rewrite', 'response', 'model'].includes(variant)) return;
+  if (!['honest', 'request', 'response', 'selection', 'model'].includes(variant)) return;
   const result = { variant, runId: data.runId, proofs: {}, certificate: null, accept: false };
   try {
     const { bundle, profile, artifacts } = await fixture();
     const example = exampleFor(bundle, variant);
     const totalStarted = performance.now();
-    let clientHash;
-    let expectedRewriteInputs;
     for (const name of ['selection', 'rewrite']) {
       self.postMessage({ type: 'progress', runId: data.runId, variant, part: name });
-      const bytes = artifacts[name].proof.slice();
-      if (variant === name) bytes[Math.floor(bytes.length / 2)] ^= 1;
+      const bytes = artifacts[name].proof;
       const started = performance.now();
       try {
         const expectedInputs = bundle.proofs[name].public_inputs.slice();
         let bindingsValid = true;
-        if (name === 'selection') bindingsValid = await verifyEncoder(bundle, profile, example);
+        if (name === 'selection') {
+          // Prove eligibility for the actual serving model, not the router's claimed name.
+          expectedInputs[12] = example.certificate.statement.model;
+          bindingsValid = await verifyEncoder(bundle, profile, example);
+        }
         else {
-          clientHash = JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
+          const clientHash = JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
           expectedInputs[8] = String(example.clientRequest.length);
           expectedInputs.splice(9, 4, ...clientHash);
+          expectedInputs[13] = String(example.forwardedApiRequest.messages.length);
           expectedInputs.splice(14, 4, ...example.certificate.statement.request_commitment);
-          expectedRewriteInputs = expectedInputs;
         }
         const verified = JSON.parse(verify_proof(bytes, artifacts[name].verifier, JSON.stringify(expectedInputs)));
         result.proofs[name] = { valid: bindingsValid && verified.verified === true, milliseconds: performance.now() - started };
@@ -152,8 +151,7 @@ self.onmessage = async ({ data }) => {
     }
     self.postMessage({ type: 'progress', runId: data.runId, variant, part: 'certificate' });
     const certificateStarted = performance.now();
-    clientHash ||= JSON.parse(hash_client_request(JSON.stringify(example.clientRequest)));
-    result.certificate = await verifyServing(bundle, profile, example, clientHash, expectedRewriteInputs);
+    result.certificate = await verifyServing(bundle, profile, example);
     result.certificate.milliseconds = performance.now() - certificateStarted;
     result.total_milliseconds = performance.now() - totalStarted;
     result.fixture_response = example.response;

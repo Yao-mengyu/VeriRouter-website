@@ -24,13 +24,13 @@ npm run preview
 
 页面使用已离线生成的两份真实 Plonky2 ZK proofs 和 Ed25519 serving certificate。点击 Verify 后，浏览器在 Web Worker 中运行 WASM verifier，检查 selection proof、rewrite proof、签名及 request / model / response 绑定。
 
-通过 Scenario 选择场景。正常场景在 Verify 前展示客户端请求的完整 API JSON，验证后展示模型回答；其他场景显示对应的转发请求或返回结果。切换场景会清空上一轮结果，等待手动点击 Verify。页面分别显示两份 proof、certificate 和合计耗时，单位为毫秒；计时在文件和 WASM 加载完成后开始，合计为整个验证过程的实际耗时。
+Scenario 与视频章节对应：Normal serving、Hidden instruction injection、Answer tampering、Wrong model selection、Model identity spoofing。正常场景在 Verify 前展示客户端请求的完整 API JSON，验证后展示模型回答；其他场景显示对应的转发请求或返回结果。切换场景会清空上一轮结果，等待手动点击 Verify。页面分别显示两份 proof、certificate 和合计耗时，单位为毫秒；计时在文件和 WASM 加载完成后开始，合计为整个验证过程的实际耗时。
 
-请求注入场景在转发请求 JSON 中展示新增的 system instruction，并使用保存的实际修改后回答。离线生成时，Demo provider 对这一份修改后的转发请求与回答签发真实 certificate。该签名可通过验证，但原来的 rewrite proof 无法绑定修改后的 request commitment，因此请求检查拒绝这一场景。客户端原始问题保持相同。回答篡改、模型身份伪装及 proof 修改场景也可分别验证。
+请求注入场景在转发请求 JSON 中展示新增的 system instruction，并使用保存的实际修改后回答。离线生成时，Demo provider 对这一份修改后的转发请求与回答签发真实 certificate。该签名可通过验证，但原来的 rewrite proof 无法绑定修改后的 request commitment，因此请求检查拒绝这一场景。客户端原始问题保持相同。回答篡改通过返回文本与签名 response hash 的不匹配被拒绝。Wrong model selection 展示视频实际使用的 `qwen/qwen-2.5-7b-instruct` 与记录回答；其 ID 为 `29`，对应真实签发的 provider certificate。签名可以通过，但既有输出 `23` 的 selection proof 无法证明模型 `29` 合法。Model identity spoofing 使用同一份 Qwen 证书和回答，却将 API model 伪称为 `openai/gpt-6-astra`，因此选模与身份绑定都会拒绝。两个 proof 的字节保持不变，验证实际 serving statement。
 
 交互例子使用视频中的牙痛问题：`I have a toothache. Can I put crushed aspirin on my gum?`，以及保存的 `google/gemini-2.5-flash` 原始回答。允许的 system message、回答篡改文本和身份伪装模型名也来自同一份 `data/demo-trace.json`。certificate 由本地 Demo provider 签发。
 
-`data/verifier-profile.json` 固定问题、请求、模型目录与公开编码规则。内部模型 ID `23` 对应 `google/gemini-2.5-flash`，`7` 对应 `openai/gpt-4o`，`5` 对应 `anthropic/claude-sonnet-4.5`。证书与 proof 使用内部 ID，页面通过固定目录显示具体模型名。
+`data/verifier-profile.json` 固定问题、请求、模型目录与公开编码规则。内部模型 ID `23` 对应 `google/gemini-2.5-flash`，`7` 对应 `openai/gpt-4o`，`5` 对应 `anthropic/claude-sonnet-4.5`，`29` 对应 `qwen/qwen-2.5-7b-instruct`。证书与 proof 使用内部 ID，页面通过固定目录显示具体模型名。
 
 小型路由例子沿用 release 的三节点图。公开的 `medical-demo-query-lookup-v1` 查找表将这一条确定的医疗请求映射到 `[10, 0]`，zero point 为 `0`。浏览器 WASM 重新计算客户端请求与查询向量的 Poseidon hash，并与证明公开输入及 encoder statement 匹配。
 
@@ -69,7 +69,7 @@ npm run generate:proofs
 npm run build
 ```
 
-`setup:prover` 预编译原始 Rust 程序。`generate:proofs` 将保存的医疗请求和允许的 system message 写入 small rewrite fixture，使用固定查询与模型目录运行路由例子，生成新的请求随机量、两份 ZK proofs 和正常 certificate，并为注入后的请求另行签发 certificate。原生证据链验证通过后，公开文件更新到 `assets/zk/`。本机已编译的程序位于 `/tmp/verirouter-native`，可直接复用：
+`setup:prover` 预编译原始 Rust 程序。`generate:proofs` 将保存的医疗请求和允许的 system message 写入 small rewrite fixture，使用固定查询与模型目录运行路由例子，生成新的请求随机量、两份 ZK proofs 和正常 certificate，并为注入后的请求和 Qwen serving event 另行签发 certificate。原生证据链验证通过后，公开文件更新到 `assets/zk/`。本机已编译的程序位于 `/tmp/verirouter-native`，可直接复用：
 
 ```sh
 CARGO_TARGET_DIR=/tmp/verirouter-native npm run generate:proofs
@@ -77,16 +77,19 @@ CARGO_TARGET_DIR=/tmp/verirouter-native npm run generate:proofs
 
 可通过 `VERIROUTER_ARTIFACT_DIR` 指定代码仓库，`CARGO_TARGET_DIR` 指定编译缓存，`PROVER_THREADS` 指定生成线程数（默认 4），`PYTHON` 指定 Python 可执行文件。本地签名私钥与编译缓存存放在被 Git 忽略的 `.local/` 中；生成脚本只导出公开证据。
 
-## Git 同步
+## 在线网站与 Git 同步
 
-本文件夹是独立网站仓库。创建空的远程仓库后：
+公开网站：[VeriRouter](https://yao-mengyu.github.io/VeriRouter-website/)。Sites 镜像：[VeriRouter](https://verirouter.navytapir3.chatgpt.site/)。
+
+网站源码仓库：[Yao-mengyu/VeriRouter-website](https://github.com/Yao-mengyu/VeriRouter-website)。本地 `origin` 已配置，后续同步：
 
 ```sh
-git remote add origin <网站仓库地址>
-git push -u origin main
+git push origin main
 ```
 
-页面 Code 链接直接打开代码仓库：[Yao-mengyu/VeriRouter-release](https://github.com/Yao-mengyu/VeriRouter-release)，private、`main` 分支、一次初始提交。内容与原 `release` 分支 commit `8f74110` 的 Git tree 相同。
+公开代码仓库：[Yao-mengyu/VeriRouter-release](https://github.com/Yao-mengyu/VeriRouter-release)，`main` 分支、一次初始提交。内容与原 `release` 分支 commit `8f74110` 的 Git tree 相同。
+
+网站的 Sites 项目已记录在 `.openai/hosting.json`，静态发布目录为 `dist/`。GitHub Pages workflow 同时保留，可使用同一份源码构建。`verirouter.org` 尚未注册；注册后可以绑定独立域名。
 
 ## 文件与来源
 
