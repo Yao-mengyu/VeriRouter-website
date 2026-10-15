@@ -20,6 +20,8 @@
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-hand-click" viewBox="0 0 24 24"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5M14 10.5a1.5 1.5 0 0 1 3 0v1.5M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47M5 3l-1 -1M4 7h-1M14 3l1 -1M15 6h1"/></symbol>
     <symbol id="i-up-right" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7z"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
@@ -91,18 +93,18 @@
 
     <section class="chapter container" id="attack" aria-labelledby="attack-title">
       <div class="chapter-heading"><p class="chapter-label"><span>01</span> Attack demo</p><h2 id="attack-title">The router can <span class="attack-accent">cheat.</span></h2><p>A toothache question becomes a sponsored recommendation or an answer from the wrong model. Our demo exposes the router actions behind these outcomes.</p></div>
-      <div class="film-frame"><video id="attack-player" controls playsinline preload="none" poster="assets/attack-cover.png" aria-label="Full attack demo"><source src="assets/media/attacks-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="attack-player" aria-label="Play the attack demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
+      <div class="film-frame"><video id="attack-player" controls playsinline preload="none" poster="assets/attack-cover.png" aria-label="Full attack demo"><source src="assets/media/attacks-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="attack-player" aria-label="Play the attack demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5 20 12 8 19Z"/></svg><span>Play demo</span></button></div>
     </section>
 
     <section class="chapter container" id="verification" aria-labelledby="verification-title">
       <div class="chapter-heading"><p class="chapter-label"><span>02</span> Verification demo</p><h2 id="verification-title">Make the router <span class="verification-accent">prove it.</span></h2><p>Our framework, VeriRouter, uses zero-knowledge proofs to verify model eligibility and endorsed request rewriting. A provider-signed serving certificate authenticates the model and its answer. The router’s semantic index and rewrite banks stay private.</p></div>
-      <div class="film-frame"><video id="verification-player" controls playsinline preload="none" poster="assets/verification-cover.png" aria-label="Full VeriRouter verification demo"><source src="assets/media/verifications-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="verification-player" aria-label="Play the verification demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 20 12 8 19Z"/></svg></button></div>
+      <div class="film-frame"><video id="verification-player" controls playsinline preload="none" poster="assets/verification-cover.png" aria-label="Full VeriRouter verification demo"><source src="assets/media/verifications-all.mp4" type="video/mp4"></video><button class="film-play" type="button" hidden data-play="verification-player" aria-label="Play the verification demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5 20 12 8 19Z"/></svg><span>Play demo</span></button></div>
     </section>
 
     <section class="chapter container" id="interactive" aria-labelledby="interactive-title">
       <div class="chapter-heading"><p class="chapter-label"><span>03</span> Interactive demo</p><h2 id="interactive-title">Try the verifier.</h2></div>
       <div class="verifier-shell" id="proof-demo">
-        <div class="verifier-toolbar"><div class="evidence-picker"><label for="proof-variant">Scenario</label><div class="select-wrap"><select id="proof-variant"><option value="honest">Normal serving</option><option value="request">Hidden instruction injection</option><option value="response">Answer tampering</option><option value="selection">Wrong model selection</option><option value="model">Model identity spoofing</option></select><svg class="icon"><use href="#i-arrow"/></svg></div></div><button class="button button-primary" id="run-proof"><svg class="icon"><use href="#i-shield"/></svg>Verify</button></div>
+        <div class="verifier-toolbar"><div class="evidence-picker"><label for="proof-variant">Scenario</label><div class="select-wrap"><select id="proof-variant"><option value="honest">Normal serving</option><option value="request">Hidden instruction injection</option><option value="response">Answer tampering</option><option value="selection">Wrong model selection</option><option value="model">Model identity spoofing</option></select><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></div></div><button class="button button-primary" id="run-proof"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-hand-click"/></svg>Verify</button></div>
         <div class="client-request"><span class="request-label">Client question</span><p id="client-question">I have a toothache. Can I put crushed aspirin on my gum?</p></div>
         <div class="verifier-route" aria-label="Client, VeriRouter and backend model workflow">
           <div class="route-node" id="node-client"><svg class="icon"><use href="#i-laptop"/></svg><span>Client</span></div>
